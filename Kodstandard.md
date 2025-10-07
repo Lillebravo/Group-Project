@@ -8,7 +8,6 @@ Detta dokument beskriver vår gemensamma kodstandard för att säkerställa kons
 
 - **Formattering:**  
   - Använd [Prettier](https://prettier.io/) för automatisk formattering.  
-  - Använd [ESLint](https://eslint.org/) med vårt delade regelset (`.eslintrc.json`).  
   - Formattera koden **innan varje commit** (helst automatiskt via pre-commit hook).
 
 - **Indentering:** 1 tab.  
