@@ -22,8 +22,6 @@ public class User {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    // FIX LATER WHEN WORKOUT ENTITY IS DONE
-
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Workout> workouts;
 

@@ -8,7 +8,7 @@ public class Exercise {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "exercise_id", columnDefinition = "INTEGER")
-    private long exerciseId;
+    private Long exerciseId;
 
     @Column(name = "name")
     private String name;
