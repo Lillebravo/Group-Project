@@ -12,7 +12,6 @@ public class Workout {
     @Column(name = "workout_id", columnDefinition = "INTEGER")
     private Long workoutId;
 
-
     @Column(name = "name", nullable = false)
     private String name;
 
