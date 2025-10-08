@@ -15,6 +15,7 @@ public class ExerciseService {
     }
 
     public List<Exercise> searchExercises(String keyword) {
-        return exerciseRepository.findByNameContainingIgnoreCaseOrMuscleGroupContainingIgnoreCase(keyword, keyword);
+        return exerciseRepository
+                .findByNameContainingIgnoreCaseOrMuscleGroupContainingIgnoreCase(keyword, keyword);
     }
 }
