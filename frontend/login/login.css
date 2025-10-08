@@ -1,0 +1,51 @@
+/* Login card */
+.login-card {
+	width: 100%;
+	max-width: 520px;
+	margin: 0 auto;
+	padding: 48px 40px;
+	background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
+	border-radius: 20px;
+	box-shadow: var(--btn-shadow);
+	border: 1px solid var(--glass);
+	backdrop-filter: blur(6px);
+}
+
+/* Title */
+.title {
+	margin: 0 0 28px 0;
+	font-size: 48px;
+	line-height: 1.02;
+	letter-spacing: -0.01em;
+	font-weight: 700;
+	color: var(--text);
+	text-align: left;
+}
+
+/* Signup paragraph */
+.signup {
+	margin: 14px 0 0;
+	color: var(--muted);
+	text-align: center;
+	font-size: 14px;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+	.login-card {
+		padding: 32px 20px;
+	}
+	.title {
+		font-size: 36px;
+	}
+}
+
+#registerModal .modal-content {
+	display: flex;
+	flex-direction: column;
+	gap: 5px;
+}
+
+#registerModal .input {
+	margin-bottom: 5px;
+}
