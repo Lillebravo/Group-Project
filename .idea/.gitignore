@@ -10,3 +10,4 @@
 /dataSources.local.xml
 #Avoiding issues with different JDK versions
 /misc.xml
+/dataSources.xml
