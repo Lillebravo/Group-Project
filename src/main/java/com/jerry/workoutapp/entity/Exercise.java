@@ -3,7 +3,7 @@ package com.jerry.workoutapp.entity;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "Exercises")
+@Table(name = "exercises")
 public class Exercise {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
