@@ -19,19 +19,14 @@ public class Workout {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = true)
-    @JoinColumn(name = "user_id", insertable = false, updatable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @OneToMany(mappedBy = "workout", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<WorkoutExercise> workoutExercises = new ArrayList<>();
 
     public Workout() {
-        this.createdAt = LocalDateTime.now();
-    }
-
-    public Workout(String name) {
-        this.name = name;
         this.createdAt = LocalDateTime.now();
     }
 
@@ -54,37 +49,19 @@ public class Workout {
     }
 
     // Getters and Setters
-    public Long getWorkoutId() {
-        return workoutId;
-    }
-    public void setWorkoutId(Long workoutId) {
-        this.workoutId = workoutId;
-    }
+    public Long getWorkoutId() { return workoutId; }
+    public void setWorkoutId(Long workoutId) { this.workoutId = workoutId; }
 
-    public User getUser() {
-        return user;
-    }
-    public void setUser(User user) {
-        this.user = user;
-    }
+    public User getUser() { return user; }
+    public void setUser(User user) { this.user = user; }
 
-    public String getName() {
-        return name;
-    }
-    public void setName(String name) {
-        this.name = name;
-    }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 
-    public List<WorkoutExercise> getWorkoutExercises() {
-        return workoutExercises;
-    }
+    public List<WorkoutExercise> getWorkoutExercises() { return workoutExercises; }
     public void setWorkoutExercises(List<WorkoutExercise> workoutExercises) {
         this.workoutExercises = workoutExercises;
     }

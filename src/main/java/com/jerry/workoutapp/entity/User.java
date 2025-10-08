@@ -36,6 +36,9 @@ public class User {
         this.createdAt = LocalDateTime.now();
     }
 
+    public long getUserId() { return userId; }
+    public void setUserId(long userId) { this.userId = userId; }
+
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
 
@@ -44,4 +47,7 @@ public class User {
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+
+    public List<Workout> getWorkouts() { return workouts; }
+    public void setWorkouts(List<Workout> workouts) { this.workouts = workouts; }
 }
