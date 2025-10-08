@@ -23,9 +23,9 @@ public class User {
     private LocalDateTime createdAt;
 
     // FIX LATER WHEN WORKOUT ENTITY IS DONE
-    // Relationships - One user can have many workouts
-    //@OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    //private List<Workout> workouts;
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<Workout> workouts;
 
 
     public User() {
