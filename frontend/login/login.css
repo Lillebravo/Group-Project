@@ -1,3 +1,8 @@
+.login-container {
+	display: flex;
+	justify-content: center;
+}
+
 /* Login card */
 .login-card {
 	width: 100%;
@@ -20,6 +25,10 @@
 	font-weight: 700;
 	color: var(--text);
 	text-align: left;
+}
+
+.signin-btn {
+	margin-top: 8px;
 }
 
 /* Signup paragraph */

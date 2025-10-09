@@ -8,7 +8,21 @@
 		<link rel="stylesheet" href="login.css" />
 	</head>
 	<body class="theme-dark">
-		<main class="container">
+		<header class="navbar">
+			<nav class="container">
+				<a href="/" class="logo">GymSite</a>
+
+				<div class="nav-items">
+					<a href="/" class="link">Hem</a>
+					<a href="#" class="link">Övningar</a>
+					<a href="#" class="link">Scheman</a>
+					<a href="#" class="link">Blogg</a>
+					<a href="/login" class="btn small link strong">Bli medlem</a>
+				</div>
+			</nav>
+		</header>
+
+		<main class="container login-container">
 			<section class="login-card" aria-labelledby="login-heading">
 				<h1 id="login-heading" class="title">Sign in</h1>
 
@@ -43,7 +57,7 @@
 						<a class="link" href="#" id="forgot">Forgot password?</a>
 					</div>
 
-					<button class="btn primary" type="submit">Sign in</button>
+					<button class="btn primary signin-btn" type="submit">Sign in</button>
 
 					<p class="signup">
 						Don't have an account?
@@ -51,11 +65,17 @@
 					</p>
 				</form>
 			</section>
-
-			<footer class="page-footer">
-				<small>© GymSite</small>
-			</footer>
 		</main>
+
+		<footer class="page-footer container">
+			<p>© GymSite</p>
+
+			<div class="footer-links">
+				<a href="#" class="link">Om oss</a>
+				<a href="#" class="link">Kontakt</a>
+				<a href="#" class="link">Integritetspolicy</a>
+			</div>
+		</footer>
 
 		<!-- Glömt lösenord -->
 		<div id="forgotModal" class="modal hidden">

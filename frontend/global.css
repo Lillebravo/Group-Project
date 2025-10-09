@@ -18,7 +18,7 @@
 
 html,
 body {
-	height: 100%;
+	min-height: 100vh;
 }
 
 body {
@@ -28,11 +28,18 @@ body {
 	color: var(--text);
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
+	padding: 32px;
+	display: flex;
+	flex-direction: column;
+}
+
+main {
+	flex: 1;
 	display: flex;
 	align-items: center;
-	justify-content: center;
 	flex-direction: column;
-	padding: 32px;
+	margin: 0 auto;
+	margin-top: 64px;
 }
 
 /*========== Components ==========*/
@@ -43,11 +50,49 @@ body {
 	max-width: 980px;
 }
 
+/* Navbar */
+
+.navbar {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	z-index: 100;
+	background: var(--bg);
+}
+
+.navbar nav {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 16px 0px;
+	margin: 0 auto;
+}
+
+.navbar .logo {
+	font-size: 24px;
+	font-weight: 600;
+	color: var(--text);
+	text-decoration: none;
+}
+
+.navbar .nav-items {
+	display: flex;
+	gap: 16px;
+	align-items: center;
+}
+
 /* Footer */
 .page-footer {
-	margin-top: 22px;
-	text-align: center;
 	color: rgba(255, 255, 255, 0.2);
+	border-top: 1px solid var(--input-border);
+	margin: 0 auto;
+	margin-top: 22px;
+}
+
+.page-footer .footer-links {
+	display: flex;
+	gap: 16px;
 }
 
 /* Form elements */
@@ -125,7 +170,6 @@ body {
 
 /* Button */
 .btn {
-	margin-top: 8px;
 	padding: 14px 18px;
 	border-radius: 12px;
 	border: 0;
@@ -182,4 +226,21 @@ body {
 .modal-content h2 {
 	margin-top: 0;
 	color: var(--text);
+}
+
+@media (max-width: 1024px) {
+	.navbar nav {
+		padding-left: 16px;
+		padding-right: 16px;
+	}
+}
+
+@media (max-width: 724px) {
+	.page-footer {
+		text-align: center;
+	}
+
+	.page-footer .footer-links {
+		justify-content: center;
+	}
 }
