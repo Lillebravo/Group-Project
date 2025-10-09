@@ -52,8 +52,30 @@ public class WorkoutService {
         Exercise exercise = exerciseRepository.findById(exerciseId)
                 .orElseThrow(() -> new RuntimeException("Exercise not found with id: " + exerciseId));
 
-        validateExerciseNotInWorkout(workout, exerciseId);
-        validateUniqueOrderIndex(workout, orderIndex);
+        List<WorkoutExercise> existingExercises = workoutExerciseRepository
+                .findByWorkout_WorkoutIdOrderByOrderIndexAsc(workoutId);
+
+        // Om orderIndex inte anges (null), sätt den till sista positionen
+        if (orderIndex == null) {
+            if (existingExercises.isEmpty()) {
+                orderIndex = 0;
+            } else {
+                // Hitta högsta order_index och lägg till 1
+                orderIndex = existingExercises.stream()
+                        .map(WorkoutExercise::getOrderIndex)
+                        .max(Integer::compareTo)
+                        .orElse(-1) + 1;
+            }
+        } else {
+            // Om orderIndex är angiven och redan upptagen, flytta alla övningar nedåt
+            for (WorkoutExercise we : existingExercises) {
+                if (we.getOrderIndex() >= orderIndex) {
+                    we.setOrderIndex(we.getOrderIndex() + 1);
+                }
+            }
+            workoutExerciseRepository.saveAll(existingExercises);
+            workoutExerciseRepository.flush();
+        }
 
         workout.addExercise(exercise, sets, reps, orderIndex);
         Workout savedWorkout = workoutRepository.save(workout);
