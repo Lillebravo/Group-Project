@@ -1,0 +1,185 @@
+:root {
+	/* Dark theme variables */
+	--bg: #0f1314; /* page background */
+	--card: #14171a; /* card / form background */
+	--muted: #aab0b3; /* secondary text */
+	--text: #e9ecef; /* primary text */
+	--input: #0e1314; /* input background slightly different */
+	--input-border: rgba(255, 255, 255, 0.04);
+	--accent: #6ee7b7; /* subtle accent (mint) - can be adjusted */
+	--btn-shadow: 0 6px 18px rgba(2, 6, 8, 0.6);
+	--radius: 12px;
+	--glass: rgba(255, 255, 255, 0.02);
+}
+
+* {
+	box-sizing: border-box;
+}
+
+html,
+body {
+	height: 100%;
+}
+
+body {
+	margin: 0;
+	font-family: Inter, "Segoe UI", Roboto, "Helvetica Neue", Arial, system-ui, -apple-system;
+	background: linear-gradient(180deg, var(--bg), #0b0d0e 80%);
+	color: var(--text);
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-direction: column;
+	padding: 32px;
+}
+
+/*========== Components ==========*/
+
+/* Limit width & center */
+.container {
+	width: 100%;
+	max-width: 980px;
+}
+
+/* Footer */
+.page-footer {
+	margin-top: 22px;
+	text-align: center;
+	color: rgba(255, 255, 255, 0.2);
+}
+
+/* Form elements */
+.form {
+	display: flex;
+	flex-direction: column;
+	gap: 14px;
+}
+.label {
+	font-size: 15px;
+	color: var(--muted);
+	margin-bottom: 6px;
+	display: block;
+}
+
+/* Inputs */
+.input {
+	width: 100%;
+	padding: 14px 16px;
+	border-radius: 12px;
+	background: var(--input);
+	border: 1px solid var(--input-border);
+	color: var(--text);
+	font-size: 16px;
+	outline: none;
+	transition: box-shadow 0.15s, transform 0.08s;
+}
+.input::placeholder {
+	color: rgba(255, 255, 255, 0.25);
+}
+.input:focus {
+	box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6), 0 0 0 4px rgba(110, 231, 183, 0.06);
+	transform: translateY(-1px);
+	border-color: rgba(110, 231, 183, 0.25);
+}
+
+/* Row helpers */
+.row {
+	display: flex;
+	align-items: center;
+}
+.between {
+	justify-content: space-between;
+}
+
+/* Checkbox label */
+.checkbox-label {
+	display: inline-flex;
+	align-items: center;
+	gap: 10px;
+	font-size: 14px;
+	color: var(--muted);
+}
+.checkbox-label input[type="checkbox"] {
+	width: 16px;
+	height: 16px;
+	accent-color: var(--accent);
+	border-radius: 4px;
+}
+
+/* Links */
+.link {
+	color: var(--muted);
+	text-decoration: none;
+	font-size: 14px;
+}
+.link:hover {
+	color: var(--text);
+	text-decoration: underline;
+}
+.strong {
+	color: var(--text);
+	font-weight: 600;
+}
+
+/* Button */
+.btn {
+	margin-top: 8px;
+	padding: 14px 18px;
+	border-radius: 12px;
+	border: 0;
+	font-weight: 600;
+	cursor: pointer;
+	font-size: 16px;
+	box-shadow: none;
+	transition: transform 0.08s, box-shadow 0.12s;
+}
+
+.btn:active {
+	transform: translateY(1px);
+}
+
+.btn.primary {
+	background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.01));
+	color: var(--text);
+	border: 1px solid rgba(255, 255, 255, 0.06);
+	box-shadow: var(--btn-shadow);
+}
+
+.btn.small {
+	padding: 6px 10px;
+	font-size: 14px;
+	border-radius: 8px;
+	background: rgba(255, 255, 255, 0.05);
+}
+
+/* Modal styling */
+.modal {
+	position: fixed;
+	inset: 0;
+	background: rgba(0, 0, 0, 0.6);
+	backdrop-filter: blur(4px);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	z-index: 100;
+}
+
+.modal.hidden {
+	display: none;
+}
+
+.modal-content {
+	background: var(--card);
+	padding: 32px;
+	border-radius: 16px;
+	width: 90%;
+	max-width: 420px;
+	box-shadow: var(--btn-shadow);
+}
+
+.modal-content h2 {
+	margin-top: 0;
+	color: var(--text);
+}
