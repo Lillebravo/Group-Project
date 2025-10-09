@@ -48,6 +48,9 @@ public class WorkoutService {
         Exercise exercise = exerciseRepository.findById(exerciseId)
                 .orElseThrow(() -> new RuntimeException("Exercise not found with id: " + exerciseId));
 
+        validateExerciseNotInWorkout(workout, exerciseId);
+        validateUniqueOrderIndex(workout, orderIndex);
+
         workout.addExercise(exercise, sets, reps, orderIndex);
         Workout savedWorkout = workoutRepository.save(workout);
         return convertToResponse(savedWorkout);
@@ -58,6 +61,26 @@ public class WorkoutService {
         return workouts.stream()
                 .map(this::convertToResponse)
                 .collect(Collectors.toList());
+    }
+
+    private void validateExerciseNotInWorkout(Workout workout, Long exerciseId) {
+        boolean exerciseExists = workout.getWorkoutExercises().stream()
+                .anyMatch(we -> exerciseId.equals(we.getExercise().getExerciseId()));
+
+        if (exerciseExists) {
+            throw new RuntimeException("Exercise with id " + exerciseId +
+                    " already exists in this workout.");
+        }
+    }
+
+    private void validateUniqueOrderIndex(Workout workout, Integer orderIndex) {
+        boolean orderIndexExists = workout.getWorkoutExercises().stream()
+                .anyMatch(we -> we.getOrderIndex().equals(orderIndex));
+
+        if (orderIndexExists) {
+            throw new RuntimeException("An exercise with order_index " + orderIndex +
+                    " already exists in this workout. Please choose a different order_index.");
+        }
     }
 
     // Converter method: Entity -> DTO
