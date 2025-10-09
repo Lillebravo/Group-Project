@@ -8,6 +8,7 @@ import com.jerry.workoutapp.entity.Workout;
 import com.jerry.workoutapp.entity.WorkoutExercise;
 import com.jerry.workoutapp.repository.ExerciseRepository;
 import com.jerry.workoutapp.repository.UserRepository;
+import com.jerry.workoutapp.repository.WorkoutExerciseRepository;
 import com.jerry.workoutapp.repository.WorkoutRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,13 +22,16 @@ public class WorkoutService {
     private final WorkoutRepository workoutRepository;
     private final UserRepository userRepository;
     private final ExerciseRepository exerciseRepository;
+    private final WorkoutExerciseRepository workoutExerciseRepository;
 
     public WorkoutService(WorkoutRepository workoutRepository,
                           UserRepository userRepository,
-                          ExerciseRepository exerciseRepository) {
+                          ExerciseRepository exerciseRepository,
+                          WorkoutExerciseRepository workoutExerciseRepository) {
         this.workoutRepository = workoutRepository;
         this.userRepository = userRepository;
         this.exerciseRepository = exerciseRepository;
+        this.workoutExerciseRepository = workoutExerciseRepository;
     }
 
     @Transactional
@@ -111,4 +115,55 @@ public class WorkoutService {
                 we.getOrderIndex()
         );
     }
+
+    // Reorder an exercise within a workout
+    @Transactional
+    public void reorderExercise(Long workoutId, Long workoutExerciseId, Integer newOrderIndex) {
+        // Hämta övningen som ska flyttas
+        WorkoutExercise exerciseToMove = workoutExerciseRepository
+                .findById(workoutExerciseId)
+                .orElseThrow(() -> new RuntimeException("Exercise not found"));
+
+        // Validera att den tillhör rätt workout
+        if (!exerciseToMove.getWorkout().getWorkoutId().equals(workoutId)) {
+            throw new RuntimeException("Exercise does not belong to this workout");
+        }
+
+        Integer oldOrderIndex = exerciseToMove.getOrderIndex();
+
+        // Om positionen är densamma, gör ingenting
+        if (oldOrderIndex.equals(newOrderIndex)) {
+            return;
+        }
+
+        // Hämta alla övningar för detta workout
+        List<WorkoutExercise> allExercises = workoutExerciseRepository
+                .findByWorkout_WorkoutIdOrderByOrderIndexAsc(workoutId);
+
+        // Om övningen flyttas nedåt (från lägre till högre index)
+        if (oldOrderIndex < newOrderIndex) {
+            for (WorkoutExercise exercise : allExercises) {
+                if (exercise.getOrderIndex() > oldOrderIndex &&
+                        exercise.getOrderIndex() <= newOrderIndex) {
+                    exercise.setOrderIndex(exercise.getOrderIndex() - 1);
+                }
+            }
+        }
+        // Om övningen flyttas uppåt (från högre till lägre index)
+        else if (oldOrderIndex > newOrderIndex) {
+            for (WorkoutExercise exercise : allExercises) {
+                if (exercise.getOrderIndex() >= newOrderIndex &&
+                        exercise.getOrderIndex() < oldOrderIndex) {
+                    exercise.setOrderIndex(exercise.getOrderIndex() + 1);
+                }
+            }
+        }
+
+        // Sätt den nya positionen för övningen som flyttas
+        exerciseToMove.setOrderIndex(newOrderIndex);
+
+        // Spara alla ändringar
+        workoutExerciseRepository.saveAll(allExercises);
+    }
+
 }
