@@ -94,6 +94,7 @@ public class WorkoutService {
                 workout.getName(),
                 workout.getUser().getUserId(),
                 workout.getCreatedAt(),
+                exerciseResponses.size(),
                 exerciseResponses
         );
     }
