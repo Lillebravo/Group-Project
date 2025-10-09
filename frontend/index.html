@@ -5,25 +5,91 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>GymSite</title>
 		<link rel="stylesheet" href="global.css" />
+		<link rel="stylesheet" href="home.css" />
 	</head>
 	<body>
+		<header class="navbar">
+			<nav class="container">
+				<a href="/" class="logo">GymSite</a>
+
+				<div class="nav-items">
+					<a href="/" class="link strong">Hem</a>
+					<a href="#" class="link">Övningar</a>
+					<a href="#" class="link">Scheman</a>
+					<a href="#" class="link">Blogg</a>
+					<a href="/login" class="btn small link">Bli medlem</a>
+				</div>
+			</nav>
+		</header>
+
 		<main class="container">
-			<div style="text-align: center">
-				<a href="login" class="link">login page</a>
+			<div class="hero">
+				<h1>Bygg ditt perfekta träningsschema</h1>
+				<p>Sök bland hundratals övningar och skapa ditt eget program.</p>
+				<input
+					class="input"
+					type="text"
+					name="search-exercises"
+					placeholder="Sök efter övning..."
+				/>
+				<button class="btn primary">Utforska övningar</button>
 			</div>
+
+			<section class="popular-exercises">
+				<h2>Populära övningar</h2>
+				<div class="popular-exercises-list">
+					<div class="popular-exercise">
+						<div class="popular-exercise-img"></div>
+						<div class="popular-exercise-info">
+							<h3>Bänkpress</h3>
+							<p>Bröst</p>
+
+							<button class="btn primary small">Lägg till i schema</button>
+						</div>
+					</div>
+
+					<div class="popular-exercise">
+						<div class="popular-exercise-img"></div>
+						<div class="popular-exercise-info">
+							<h3>Knäböj</h3>
+							<p>Ben</p>
+
+							<button class="btn primary small">Lägg till i schema</button>
+						</div>
+					</div>
+
+					<div class="popular-exercise">
+						<div class="popular-exercise-img"></div>
+						<div class="popular-exercise-info">
+							<h3>Bänkpress</h3>
+							<p>Rygg</p>
+
+							<button class="btn primary small">Lägg till i schema</button>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<section class="builder">
+				<div class="builder-img"></div>
+				<div class="builder-info">
+					<h3>
+						Skapa ditt träningsschema<br />
+						steg för steg
+					</h3>
+					<a href="#" class="btn primary link">Starta byggaren</a>
+				</div>
+			</section>
 		</main>
 
-		<footer class="page-footer">
+		<footer class="page-footer container">
 			<p>© GymSite</p>
+
+			<div class="footer-links">
+				<a href="#" class="link">Om oss</a>
+				<a href="#" class="link">Kontakt</a>
+				<a href="#" class="link">Integritetspolicy</a>
+			</div>
 		</footer>
-
-		<!-- <script type="module">
-			// example usage of api.js
-
-			import { getRequest } from "./api.js";
-
-			const response = await getRequest("/users");
-			console.log(response);
-		</script> -->
 	</body>
 </html>

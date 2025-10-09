@@ -1,0 +1,96 @@
+.hero {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 16px;
+	margin: 0 auto;
+	margin-top: 64px;
+	text-align: center;
+
+	max-width: 560px;
+}
+
+.hero h1 {
+	margin: 0;
+}
+
+.popular-exercises {
+	margin-top: 64px;
+	width: 100%;
+}
+
+.popular-exercises-list {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+	gap: 16px;
+}
+
+.popular-exercise {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	background-color: var(--card);
+	border-radius: var(--radius);
+	overflow: hidden;
+	padding-bottom: 24px;
+}
+
+.popular-exercise-img {
+	height: 128px;
+	width: 100%;
+	background-color: var(--input-border);
+}
+
+.popular-exercise-info {
+	padding: 0 16px;
+}
+
+.builder {
+	margin-top: 72px;
+	margin-bottom: 72px;
+	width: 100%;
+	display: flex;
+	align-items: center;
+	gap: 32px;
+}
+
+.builder-img {
+	height: 200px;
+	width: 200px;
+	background-color: var(--card);
+	border-radius: var(--radius);
+}
+
+.builder-info {
+	display: flex;
+	flex-direction: column;
+	gap: 24px;
+}
+
+.builder-info h3 {
+	margin: 0;
+	font-size: 36px;
+	color: var(--muted);
+}
+
+.builder-info a {
+	width: fit-content;
+}
+
+@media (max-width: 724px) {
+	.builder {
+		flex-direction: column;
+		align-items: start;
+	}
+
+	.builder-img {
+		width: 100%;
+	}
+}
+
+@media (max-width: 600px) {
+	.builder-info h3 {
+		font-size: 24px;
+	}
+}
