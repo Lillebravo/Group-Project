@@ -22,44 +22,22 @@ public class WorkoutResponse {
     }
 
     // Getters and Setters
-    public Long getWorkoutId() {
-        return workoutId;
-    }
-    public void setWorkoutId(Long workoutId) {
-        this.workoutId = workoutId;
-    }
+    public Long getWorkoutId() { return workoutId; }
+    public void setWorkoutId(Long workoutId) { this.workoutId = workoutId; }
 
-    public String getName() {
-        return name;
-    }
-    public void setName(String name) {
-        this.name = name;
-    }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
 
-    public Long getUserId() {
-        return userId;
-    }
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
+    public Long getUserId() { return userId; }
+    public void setUserId(Long userId) { this.userId = userId; }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 
-    public Integer getExerciseCount() {
-        return exerciseCount;
-    }
-    public void setExerciseCount(Integer exerciseCount) {
-        this.exerciseCount = exerciseCount;
-    }
+    public Integer getExerciseCount() { return exerciseCount; }
+    public void setExerciseCount(Integer exerciseCount) { this.exerciseCount = exerciseCount; }
 
-    public List<WorkoutExerciseResponse> getExercises() {
-        return exercises;
-    }
+    public List<WorkoutExerciseResponse> getExercises() { return exercises; }
     public void setExercises(List<WorkoutExerciseResponse> exercises) {
         this.exercises = exercises;
     }

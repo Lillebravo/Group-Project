@@ -23,59 +23,26 @@ public class WorkoutExerciseResponse {
         this.orderIndex = orderIndex;
     }
 
-    public Long getWorkoutExerciseId() {
-        return workoutExerciseId;
-    }
-
+    public Long getWorkoutExerciseId() { return workoutExerciseId; }
     public void setWorkoutExerciseId(Long workoutExerciseId) {
         this.workoutExerciseId = workoutExerciseId;
     }
 
-    public Long getExerciseId() {
-        return exerciseId;
-    }
+    public Long getExerciseId() { return exerciseId; }
+    public void setExerciseId(Long exerciseId) { this.exerciseId = exerciseId; }
 
-    public void setExerciseId(Long exerciseId) {
-        this.exerciseId = exerciseId;
-    }
+    public String getExerciseName() { return exerciseName; }
+    public void setExerciseName(String exerciseName) { this.exerciseName = exerciseName; }
 
-    public String getExerciseName() {
-        return exerciseName;
-    }
+    public String getMuscleGroup() { return muscleGroup; }
+    public void setMuscleGroup(String muscleGroup) { this.muscleGroup = muscleGroup; }
 
-    public void setExerciseName(String exerciseName) {
-        this.exerciseName = exerciseName;
-    }
+    public Integer getSets() { return sets; }
+    public void setSets(Integer sets) { this.sets = sets; }
 
-    public String getMuscleGroup() {
-        return muscleGroup;
-    }
+    public Integer getReps() { return reps; }
+    public void setReps(Integer reps) { this.reps = reps; }
 
-    public void setMuscleGroup(String muscleGroup) {
-        this.muscleGroup = muscleGroup;
-    }
-
-    public Integer getSets() {
-        return sets;
-    }
-
-    public void setSets(Integer sets) {
-        this.sets = sets;
-    }
-
-    public Integer getReps() {
-        return reps;
-    }
-
-    public void setReps(Integer reps) {
-        this.reps = reps;
-    }
-
-    public Integer getOrderIndex() {
-        return orderIndex;
-    }
-
-    public void setOrderIndex(Integer orderIndex) {
-        this.orderIndex = orderIndex;
-    }
+    public Integer getOrderIndex() { return orderIndex; }
+    public void setOrderIndex(Integer orderIndex) { this.orderIndex = orderIndex; }
 }
