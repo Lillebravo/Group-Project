@@ -2,6 +2,7 @@ package com.jerry.workoutapp.controller;
 
 import com.jerry.workoutapp.dto.AddExerciseRequest;
 import com.jerry.workoutapp.dto.CreateWorkoutRequest;
+import com.jerry.workoutapp.dto.ReorderExerciseDto;
 import com.jerry.workoutapp.dto.WorkoutResponse;
 import com.jerry.workoutapp.service.WorkoutService;
 import org.springframework.http.HttpStatus;
@@ -53,4 +54,18 @@ public class WorkoutController {
         );
         return ResponseEntity.ok(updatedWorkout);
     }
+
+    // Reorder an exercise in a workout
+    @PutMapping("/{workoutId}/exercises/reorder")
+    public ResponseEntity<Void> reorderExercise(
+            @PathVariable Long workoutId,
+            @RequestBody ReorderExerciseDto request) {
+        workoutService.reorderExercise(
+                workoutId,
+                request.getWorkoutExerciseId(),
+                request.getNewOrderIndex()
+        );
+        return ResponseEntity.ok().build();
+    }
+
 }
