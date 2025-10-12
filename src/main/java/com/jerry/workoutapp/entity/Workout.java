@@ -24,6 +24,7 @@ public class Workout {
     private User user;
 
     @OneToMany(mappedBy = "workout", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("orderIndex ASC") // Sort in db directly
     private List<WorkoutExercise> workoutExercises = new ArrayList<>();
 
     public Workout() {

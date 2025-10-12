@@ -7,7 +7,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class WorkoutAppApplication {
 
     public static void main(String[] args) {
+
         SpringApplication.run(WorkoutAppApplication.class, args);
+
+        System.out.println("Workout Application Started");
     }
 
 }
