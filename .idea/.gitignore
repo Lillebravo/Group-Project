@@ -11,3 +11,5 @@
 #Avoiding issues with different JDK versions
 /misc.xml
 /dataSources.xml
+#remove db from commits
+/workout.db

@@ -173,6 +173,20 @@ public class WorkoutService {
         workoutExerciseRepository.saveAll(allExercises);
     }
 
+    //Delete workout method
+    @Transactional
+    public Workout deleteWorkout(Long id) {
+
+        //Validate workout id
+        validation.validateLong(id, "Workout ID", 1L, "Workout ID must be greater than 0");
+
+        Workout workout = workoutRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Workout not found with id " + id));
+
+        workoutRepository.delete(workout);
+        return workout;
+    }
+
     private void validateExerciseNotInWorkout(Workout workout, Long exerciseId) {
         boolean exerciseExists = workout.getWorkoutExercises().stream()
                 .anyMatch(we -> exerciseId.equals(we.getExercise().getExerciseId()));
@@ -223,20 +237,5 @@ public class WorkoutService {
                 we.getOrderIndex()
         );
     }
-
-    //Delete workout method
-    @Transactional
-    public Workout deleteWorkout(Long id) {
-
-        //Validate workout id
-        validation.validateLong(id, "Workout ID", 1L, "Workout ID must be greater than 0");
-
-        Workout workout = workoutRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Workout not found with id " + id));
-
-        workoutRepository.delete(workout);
-        return workout;
-    }
-
 
 }

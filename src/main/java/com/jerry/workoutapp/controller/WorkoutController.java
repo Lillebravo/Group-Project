@@ -73,8 +73,6 @@ public class WorkoutController {
     public ResponseEntity<Void> deleteWorkout(@PathVariable Long workoutId){
         workoutService.deleteWorkout(workoutId);
         return ResponseEntity.ok().build();
-
-
     }
 
 }
