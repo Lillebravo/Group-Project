@@ -10,6 +10,8 @@ import com.jerry.workoutapp.repository.ExerciseRepository;
 import com.jerry.workoutapp.repository.UserRepository;
 import com.jerry.workoutapp.repository.WorkoutExerciseRepository;
 import com.jerry.workoutapp.repository.WorkoutRepository;
+import com.jerry.workoutapp.util.Validation;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -26,15 +28,17 @@ public class WorkoutService {
     private final UserRepository userRepository;
     private final ExerciseRepository exerciseRepository;
     private final WorkoutExerciseRepository workoutExerciseRepository;
+    private final Validation validation;
 
     public WorkoutService(WorkoutRepository workoutRepository,
                           UserRepository userRepository,
                           ExerciseRepository exerciseRepository,
-                          WorkoutExerciseRepository workoutExerciseRepository) {
+                          WorkoutExerciseRepository workoutExerciseRepository, Validation validation) {
         this.workoutRepository = workoutRepository;
         this.userRepository = userRepository;
         this.exerciseRepository = exerciseRepository;
         this.workoutExerciseRepository = workoutExerciseRepository;
+        this.validation = validation;
     }
 
     @Transactional
@@ -219,5 +223,20 @@ public class WorkoutService {
                 we.getOrderIndex()
         );
     }
+
+    //Delete workout method
+    @Transactional
+    public Workout deleteWorkout(Long id) {
+
+        //Validate workout id
+        validation.validateLong(id, "Workout ID", 1L, "Workout ID must be greater than 0");
+
+        Workout workout = workoutRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Workout not found with id " + id));
+
+        workoutRepository.delete(workout);
+        return workout;
+    }
+
 
 }
