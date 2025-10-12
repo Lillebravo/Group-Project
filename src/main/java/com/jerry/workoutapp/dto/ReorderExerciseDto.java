@@ -14,7 +14,6 @@ public class ReorderExerciseDto {
     public Long getWorkoutExerciseId() {
         return workoutExerciseId;
     }
-
     public void setWorkoutExerciseId(Long workoutExerciseId) {
         this.workoutExerciseId = workoutExerciseId;
     }
@@ -22,7 +21,6 @@ public class ReorderExerciseDto {
     public Integer getNewOrderIndex() {
         return newOrderIndex;
     }
-
     public void setNewOrderIndex(Integer newOrderIndex) {
         this.newOrderIndex = newOrderIndex;
     }
