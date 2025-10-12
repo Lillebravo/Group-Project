@@ -5,14 +5,13 @@ import com.jerry.workoutapp.dto.CreateWorkoutRequest;
 import com.jerry.workoutapp.dto.ReorderExerciseDto;
 import com.jerry.workoutapp.dto.WorkoutResponse;
 import com.jerry.workoutapp.service.WorkoutService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/workouts")
+@RequestMapping("/api/workouts")
 public class WorkoutController {
 
     private final WorkoutService workoutService;
@@ -26,15 +25,15 @@ public class WorkoutController {
     // Request body contains userId and workout name
     @PostMapping
     public ResponseEntity<WorkoutResponse> createWorkout(@RequestBody CreateWorkoutRequest request) {
-        WorkoutResponse createdWorkout = workoutService.createWorkout(request.getUserId(), request.getName());
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdWorkout);
+        WorkoutResponse response = workoutService.createWorkout(request.getName());
+        return ResponseEntity.ok(response);
     }
 
     // Get all workouts for a single user
-    // GET /api/workouts?userId=1
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<List<WorkoutResponse>> getUserWorkouts(@PathVariable Long userId) {
-        List<WorkoutResponse> workouts = workoutService.getUserWorkouts(userId);
+    // GET /api/workouts/user
+    @GetMapping("/user")
+    public ResponseEntity<List<WorkoutResponse>> getUserWorkouts() {
+        List<WorkoutResponse> workouts = workoutService.getUserWorkouts();
         return ResponseEntity.ok(workouts);
     }
 

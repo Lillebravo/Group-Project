@@ -22,18 +22,36 @@ public class User {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
+    @Column(name = "role")
+    private String role;
+
+    @Column(name = "enabled", columnDefinition = "INTEGER")
+    private int enabled;
+
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Workout> workouts;
 
 
     public User() {
         this.createdAt = LocalDateTime.now();
+        this.role = "USER";
+        this.enabled = 1;
     }
 
     public User(String email, String passwordHash, LocalDateTime createdAt) {
         this.email = email;
         this.passwordHash = passwordHash;
         this.createdAt = LocalDateTime.now();
+        this.role = "USER";
+        this.enabled = 1;
+    }
+
+    public User(String email, String passwordHash, LocalDateTime createdAt, String role) {
+        this.email = email;
+        this.passwordHash = passwordHash;
+        this.createdAt = LocalDateTime.now();
+        this.role = role;
+        this.enabled = 1;
     }
 
     public long getUserId() { return userId; }
@@ -47,6 +65,12 @@ public class User {
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+
+    public String getRole() { return role; }
+    public void setRole(String role) { this.role = role; }
+
+    public int getEnabled() { return enabled; }
+    public void setEnabled(int enabled) { this.enabled = enabled; }
 
     public List<Workout> getWorkouts() { return workouts; }
     public void setWorkouts(List<Workout> workouts) { this.workouts = workouts; }

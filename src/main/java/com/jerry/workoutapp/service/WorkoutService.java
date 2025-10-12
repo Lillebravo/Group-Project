@@ -10,9 +10,12 @@ import com.jerry.workoutapp.repository.ExerciseRepository;
 import com.jerry.workoutapp.repository.UserRepository;
 import com.jerry.workoutapp.repository.WorkoutExerciseRepository;
 import com.jerry.workoutapp.repository.WorkoutRepository;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,9 +38,17 @@ public class WorkoutService {
     }
 
     @Transactional
-    public WorkoutResponse createWorkout(Long userId, String workoutName) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
+    public WorkoutResponse createWorkout(String workoutName) {
+        // Fetch the user by email
+        User user = getAuthenticatedUser();
+
+        // Check if a workout with this name already exists for this user
+        boolean exists = workoutRepository
+                .findByNameAndUser_UserId(workoutName, user.getUserId()).isPresent();
+        if (exists) {
+            throw new RuntimeException("Workout with name '" + workoutName
+                    + "' already exists for this user.");
+        }
 
         Workout workout = new Workout(workoutName, user);
         Workout savedWorkout = workoutRepository.save(workout);
@@ -45,15 +56,24 @@ public class WorkoutService {
     }
 
     @Transactional
-    public WorkoutResponse addExerciseToWorkout(Long workoutId, Long exerciseId, Integer sets, Integer reps, Integer orderIndex) {
-        Workout workout = workoutRepository.findById(workoutId)
-                .orElseThrow(() -> new RuntimeException("Workout not found with id: " + workoutId));
+    public WorkoutResponse addExerciseToWorkout(Long workoutId, Long exerciseId
+            , Integer sets, Integer reps, Integer orderIndex) {
+
+        User user = getAuthenticatedUser();
+
+        // Fetch workout and verify ownership of it
+        Workout workout = workoutRepository.findByWorkoutIdAndUser_UserId(workoutId, user.getUserId())
+                .orElseThrow(() -> new RuntimeException(
+                        "Workout not found or you don't have permission to modify it"));
 
         Exercise exercise = exerciseRepository.findById(exerciseId)
-                .orElseThrow(() -> new RuntimeException("Exercise not found with id: " + exerciseId));
+                .orElseThrow(() -> new RuntimeException("Exercise not found with id: "
+                        + exerciseId));
 
         List<WorkoutExercise> existingExercises = workoutExerciseRepository
                 .findByWorkout_WorkoutIdOrderByOrderIndexAsc(workoutId);
+
+        validateExerciseNotInWorkout(workout, exerciseId);
 
         // Om orderIndex inte anges (null), sätt den till sista positionen
         if (orderIndex == null) {
@@ -82,11 +102,71 @@ public class WorkoutService {
         return convertToResponse(savedWorkout);
     }
 
-    public List<WorkoutResponse> getUserWorkouts(Long userId) {
-        List<Workout> workouts = workoutRepository.findByUser_UserId(userId);
+    public List<WorkoutResponse> getUserWorkouts() {
+        User user = getAuthenticatedUser();
+
+        List<Workout> workouts = workoutRepository.findByUser_UserId(user.getUserId());
         return workouts.stream()
                 .map(this::convertToResponse)
                 .collect(Collectors.toList());
+    }
+
+    // Reorder an exercise within a workout
+    @Transactional
+    public void reorderExercise(Long workoutId, Long workoutExerciseId, Integer newOrderIndex) {
+        // Get authenticated user
+        User user = getAuthenticatedUser();
+
+        // Verify workout ownership
+        Workout workout = workoutRepository.findByWorkoutIdAndUser_UserId(workoutId, user.getUserId())
+                .orElseThrow(() -> new RuntimeException(
+                        "Workout not found or you don't have permission to modify it"));
+
+        // Fetch the exercise to be moved
+        WorkoutExercise exerciseToMove = workoutExerciseRepository
+                .findById(workoutExerciseId)
+                .orElseThrow(() -> new RuntimeException("Exercise not found"));
+
+        // Validate it belongs to the right workout
+        if (!exerciseToMove.getWorkout().getWorkoutId().equals(workoutId)) {
+            throw new RuntimeException("Exercise does not belong to this workout");
+        }
+
+        Integer oldOrderIndex = exerciseToMove.getOrderIndex();
+
+        // If pos is same, do nothing
+        if (oldOrderIndex.equals(newOrderIndex)) {
+            return;
+        }
+
+        // Fetch all exercises in this workout
+        List<WorkoutExercise> allExercises = workoutExerciseRepository
+                .findByWorkout_WorkoutIdOrderByOrderIndexAsc(workoutId);
+
+        // If exercise moves down (from lower to higher index)
+        if (oldOrderIndex < newOrderIndex) {
+            for (WorkoutExercise exercise : allExercises) {
+                if (exercise.getOrderIndex() > oldOrderIndex &&
+                        exercise.getOrderIndex() <= newOrderIndex) {
+                    exercise.setOrderIndex(exercise.getOrderIndex() - 1);
+                }
+            }
+        }
+        // If exercise moves up (from higher to lower index)
+        else if (oldOrderIndex > newOrderIndex) {
+            for (WorkoutExercise exercise : allExercises) {
+                if (exercise.getOrderIndex() >= newOrderIndex &&
+                        exercise.getOrderIndex() < oldOrderIndex) {
+                    exercise.setOrderIndex(exercise.getOrderIndex() + 1);
+                }
+            }
+        }
+
+        // Set new pos for exercise to be moved
+        exerciseToMove.setOrderIndex(newOrderIndex);
+
+        // Save all changes
+        workoutExerciseRepository.saveAll(allExercises);
     }
 
     private void validateExerciseNotInWorkout(Workout workout, Long exerciseId) {
@@ -99,19 +179,21 @@ public class WorkoutService {
         }
     }
 
-    private void validateUniqueOrderIndex(Workout workout, Integer orderIndex) {
-        boolean orderIndexExists = workout.getWorkoutExercises().stream()
-                .anyMatch(we -> we.getOrderIndex().equals(orderIndex));
+    // Helper method to get the authenticated user
+    private User getAuthenticatedUser() {
+        // Get the currently authenticated user's ID from the security context
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName(); // This gets the email from the JWT
 
-        if (orderIndexExists) {
-            throw new RuntimeException("An exercise with order_index " + orderIndex +
-                    " already exists in this workout. Please choose a different order_index.");
-        }
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found: " + email));
     }
 
     // Converter method: Entity -> DTO
     private WorkoutResponse convertToResponse(Workout workout) {
         List<WorkoutExerciseResponse> exerciseResponses = workout.getWorkoutExercises().stream()
+                // Extra safety for making sure exercises are sorted by index
+                .sorted(Comparator.comparing(WorkoutExercise::getOrderIndex))
                 .map(this::convertToExerciseResponse)
                 .collect(Collectors.toList());
 
@@ -136,56 +218,6 @@ public class WorkoutService {
                 we.getReps(),
                 we.getOrderIndex()
         );
-    }
-
-    // Reorder an exercise within a workout
-    @Transactional
-    public void reorderExercise(Long workoutId, Long workoutExerciseId, Integer newOrderIndex) {
-        // Hämta övningen som ska flyttas
-        WorkoutExercise exerciseToMove = workoutExerciseRepository
-                .findById(workoutExerciseId)
-                .orElseThrow(() -> new RuntimeException("Exercise not found"));
-
-        // Validera att den tillhör rätt workout
-        if (!exerciseToMove.getWorkout().getWorkoutId().equals(workoutId)) {
-            throw new RuntimeException("Exercise does not belong to this workout");
-        }
-
-        Integer oldOrderIndex = exerciseToMove.getOrderIndex();
-
-        // Om positionen är densamma, gör ingenting
-        if (oldOrderIndex.equals(newOrderIndex)) {
-            return;
-        }
-
-        // Hämta alla övningar för detta workout
-        List<WorkoutExercise> allExercises = workoutExerciseRepository
-                .findByWorkout_WorkoutIdOrderByOrderIndexAsc(workoutId);
-
-        // Om övningen flyttas nedåt (från lägre till högre index)
-        if (oldOrderIndex < newOrderIndex) {
-            for (WorkoutExercise exercise : allExercises) {
-                if (exercise.getOrderIndex() > oldOrderIndex &&
-                        exercise.getOrderIndex() <= newOrderIndex) {
-                    exercise.setOrderIndex(exercise.getOrderIndex() - 1);
-                }
-            }
-        }
-        // Om övningen flyttas uppåt (från högre till lägre index)
-        else if (oldOrderIndex > newOrderIndex) {
-            for (WorkoutExercise exercise : allExercises) {
-                if (exercise.getOrderIndex() >= newOrderIndex &&
-                        exercise.getOrderIndex() < oldOrderIndex) {
-                    exercise.setOrderIndex(exercise.getOrderIndex() + 1);
-                }
-            }
-        }
-
-        // Sätt den nya positionen för övningen som flyttas
-        exerciseToMove.setOrderIndex(newOrderIndex);
-
-        // Spara alla ändringar
-        workoutExerciseRepository.saveAll(allExercises);
     }
 
 }
