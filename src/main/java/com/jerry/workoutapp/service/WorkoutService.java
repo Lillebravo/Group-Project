@@ -177,13 +177,22 @@ public class WorkoutService {
     @Transactional
     public Workout deleteWorkout(Long id) {
 
-        //Validate workout id
+        // validate workoutId
         validation.validateLong(id, "Workout ID", 1L, "Workout ID must be greater than 0");
 
-        Workout workout = workoutRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Workout not found with id " + id));
+        // get authenticated user
+        User user = getAuthenticatedUser();
+
+        // fetch workout and verify ownership of it
+        Workout workout = workoutRepository
+                .findByWorkoutIdAndUser_UserId(id, user.getUserId())
+                .orElseThrow(() -> new RuntimeException(
+                        "Workout not found or you don't have permission to delete it"));
+
 
         workoutRepository.delete(workout);
+
+
         return workout;
     }
 
