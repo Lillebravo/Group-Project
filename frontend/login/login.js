@@ -1,3 +1,5 @@
+import { postRequest, setJwtToken } from "../api.js";
+
 document.addEventListener("DOMContentLoaded", () => {
 	const form = document.getElementById("loginForm");
 	const emailInput = document.getElementById("email");
@@ -17,7 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	}
 
 	/* ---------- 2. FORM SUBMIT ------------- */
-	form.addEventListener("submit", (e) => {
+	form.addEventListener("submit", async (e) => {
 		e.preventDefault();
 		const email = emailInput.value.trim();
 		const password = passInput.value;
@@ -37,11 +39,19 @@ document.addEventListener("DOMContentLoaded", () => {
 		btn.disabled = true;
 		btn.textContent = "Logging in...";
 
-		setTimeout(() => {
-			btn.disabled = false;
-			btn.textContent = "Sign in";
-			alert("Login succeeded!");
-		}, 1200);
+		const response = await postRequest("/auth/login", { email, password });
+
+		btn.disabled = false;
+		btn.textContent = "Sign in";
+
+		if (response.error) {
+			alert(response.error);
+			return;
+		}
+
+		setJwtToken(response.type, response.token);
+
+		window.location.href = "/";
 	});
 
 	/* ---------- 3. GLÖMT LÖSENORD (modal) ------------- */
@@ -83,25 +93,28 @@ document.addEventListener("DOMContentLoaded", () => {
 	});
 
 	function clearRegisterFields() {
-		document.getElementById("firstName").value = "";
-		document.getElementById("lastName").value = "";
 		document.getElementById("regEmail").value = "";
 		document.getElementById("regPassword").value = "";
 	}
 
-	submitRegister.addEventListener("click", () => {
-		const first = document.getElementById("firstName").value.trim();
-		const last = document.getElementById("lastName").value.trim();
+	submitRegister.addEventListener("click", async () => {
 		const email = document.getElementById("regEmail").value.trim();
-		const pass = document.getElementById("regPassword").value;
+		const password = document.getElementById("regPassword").value;
 
-		if (!first || !last || !email || !pass) {
+		if (!email || !password) {
 			alert("Fill in all fields to create an account.");
+			return;
+		}
+
+		const response = await postRequest("/auth/register", { email, password });
+
+		if (response) {
+			alert(response.error || response);
 			return;
 		}
 
 		registerModal.classList.add("hidden");
 		clearRegisterFields();
-		alert(`Account created for ${first} ${last} (${email}).`);
+		alert(`Account created for ${email}.`);
 	});
 });

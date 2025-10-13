@@ -17,7 +17,7 @@
 					<a href="#" class="link">Övningar</a>
 					<a href="#" class="link">Scheman</a>
 					<a href="#" class="link">Blogg</a>
-					<a href="/login" class="btn small link strong">Bli medlem</a>
+					<a href="/login" id="signInBtn" class="btn small link strong">Bli medlem</a>
 				</div>
 			</nav>
 		</header>
@@ -95,8 +95,6 @@
 			<div class="modal-content">
 				<h2>Create account</h2>
 				<p>Fill in your details to register.</p>
-				<input id="firstName" type="text" class="input" placeholder="First name" />
-				<input id="lastName" type="text" class="input" placeholder="Last name" />
 				<input id="regEmail" type="email" class="input" placeholder="Email" />
 				<input id="regPassword" type="password" class="input" placeholder="Password" />
 
@@ -107,6 +105,7 @@
 			</div>
 		</div>
 
+		<script src="../nav.js" type="module"></script>
 		<script src="login.js" type="module"></script>
 	</body>
 </html>
