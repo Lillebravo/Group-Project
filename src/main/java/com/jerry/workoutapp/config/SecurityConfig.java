@@ -1,6 +1,7 @@
 package com.jerry.workoutapp.config;
 
 import com.jerry.workoutapp.service.UserDetailsServiceImpl;
+import io.micrometer.common.lang.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,6 +16,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 @EnableMethodSecurity // Enables @PreAuthorize and similar annotations on methods
@@ -79,6 +82,20 @@ public class SecurityConfig {
         authProvider.setUserDetailsService(userDetailsService); // How to load user details
         authProvider.setPasswordEncoder(passwordEncoder()); // How to encode/verify passwords
         return authProvider;
+    }
+
+    @Bean
+    public WebMvcConfigurer corsConfigurer() {
+        return new WebMvcConfigurer() {
+            @Override
+            public void addCorsMappings(@NonNull CorsRegistry registry) {
+                registry.addMapping("/**")
+                        .allowedOrigins("http://localhost:5500", "http://127.0.0.1:5500")
+                        .allowedHeaders("*")
+                        .allowCredentials(true)
+                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS");
+            }
+        };
     }
 
 }
