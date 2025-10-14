@@ -1,7 +1,7 @@
 package com.jerry.workoutapp.controller;
 
 import com.jerry.workoutapp.dto.ExerciseResponse;
-import com.jerry.workoutapp.entity.Exercise;
+
 import com.jerry.workoutapp.service.ExerciseService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,7 +31,7 @@ public class ExerciseController {
 
     // Get all exercises
     @GetMapping
-    private ResponseEntity<List<ExerciseResponse>> getAllExercises() {
+    public ResponseEntity<List<ExerciseResponse>> getAllExercises() {
         List<ExerciseResponse> exercises = exerciseService.getAllExercises();
         return ResponseEntity.ok(exercises);
     }
