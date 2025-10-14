@@ -12,6 +12,7 @@ import com.jerry.workoutapp.repository.WorkoutExerciseRepository;
 import com.jerry.workoutapp.repository.WorkoutRepository;
 import com.jerry.workoutapp.util.Validation;
 import jakarta.persistence.EntityNotFoundException;
+import org.hibernate.jdbc.Work;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -207,7 +208,7 @@ public class WorkoutService {
     }
 
     // Helper method to get the authenticated user
-    private User getAuthenticatedUser() {
+    public User getAuthenticatedUser() {
         // Get the currently authenticated user's ID from the security context
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName(); // This gets the email from the JWT
@@ -246,5 +247,11 @@ public class WorkoutService {
                 we.getOrderIndex()
         );
     }
+
+
+
+
+
+
 
 }
