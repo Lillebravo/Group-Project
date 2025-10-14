@@ -1,6 +1,7 @@
 package com.jerry.workoutapp.dto;
 
 public class ExerciseResponse {
+    private Long exerciseId;
 
     private String name;
 
@@ -10,12 +11,16 @@ public class ExerciseResponse {
 
     private String equipment;
 
-    public ExerciseResponse(String name, String muscleGroup, String description, String equipment) {
+    public ExerciseResponse(Long exerciseId, String name, String description, String muscleGroup, String equipment) {
+        this.exerciseId = exerciseId;
         this.name = name;
-        this.muscleGroup = muscleGroup;
         this.description = description;
+        this.muscleGroup = muscleGroup;
         this.equipment = equipment;
     }
+
+    public Long getExerciseId() {return exerciseId;}
+    public void setExerciseId(Long exerciseId) {this.exerciseId = exerciseId;}
 
     public String getName() {return name;}
     public void setName(String name) {this.name = name;}

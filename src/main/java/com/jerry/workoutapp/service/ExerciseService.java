@@ -22,6 +22,7 @@ public class ExerciseService {
 
         return exercises.stream()
                 .map(ex -> new ExerciseResponse(
+                        ex.getExerciseId(),
                         ex.getName(),
                         ex.getDescription(),
                         ex.getMuscleGroup(),
@@ -35,6 +36,7 @@ public class ExerciseService {
 
         return exercises.stream()
                 .map(ex -> new ExerciseResponse(
+                        ex.getExerciseId(),
                         ex.getName(),
                         ex.getDescription(),
                         ex.getMuscleGroup(),
