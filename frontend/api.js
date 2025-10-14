@@ -1,6 +1,13 @@
-const BASE_URL = "http://localhost:8080";
+const BASE_URL = "http://localhost:8080/api";
 
-// Will eventually handle JWT tokens
+// Shouldn't actually be saved in localStorage, but it's the most convenient for now
+export function getJwtTokenInfo() {
+	return JSON.parse(localStorage.getItem("token"));
+}
+
+export function setJwtToken(type, token) {
+	localStorage.setItem("token", JSON.stringify({ type, token }));
+}
 
 /**
  * Sends a GET request to the specified URL with optional data.
@@ -8,13 +15,7 @@ const BASE_URL = "http://localhost:8080";
  * @returns {Promise} A promise that resolves to the response data.
  */
 export async function getRequest(url) {
-	return fetch(BASE_URL + url, {
-		method: "GET",
-		headers: {
-			"Content-Type": "application/json",
-			Accept: "application/json",
-		},
-	}).then((res) => res.json());
+	return baseFetch(url, null, "GET");
 }
 
 /**
@@ -24,14 +25,7 @@ export async function getRequest(url) {
  * @returns {Promise} A promise that resolves to the response data.
  */
 export async function postRequest(url, data) {
-	return fetch(BASE_URL + url, {
-		method: "POST",
-		headers: {
-			"Content-Type": "application/json",
-			Accept: "application/json",
-		},
-		body: JSON.stringify(data),
-	}).then((res) => res.json());
+	return baseFetch(url, data, "POST");
 }
 
 /**
@@ -41,14 +35,7 @@ export async function postRequest(url, data) {
  * @returns {Promise} A promise that resolves to the response data.
  */
 export async function putRequest(url, data) {
-	return fetch(BASE_URL + url, {
-		method: "PUT",
-		headers: {
-			"Content-Type": "application/json",
-			Accept: "application/json",
-		},
-		body: JSON.stringify(data),
-	}).then((res) => res.json());
+	return baseFetch(url, data, "PUT");
 }
 
 /**
@@ -58,12 +45,25 @@ export async function putRequest(url, data) {
  * @returns {Promise} A promise that resolves to the response data.
  */
 export async function deleteRequest(url, data) {
-	return fetch(BASE_URL + url, {
-		method: "DELETE",
+	return baseFetch(url, data, "DELETE");
+}
+
+async function baseFetch(url, data, method) {
+	const jwt = getJwtTokenInfo();
+	const options = {
+		method,
 		headers: {
 			"Content-Type": "application/json",
-			Accept: "application/json",
 		},
-		body: JSON.stringify(data),
-	}).then((res) => res.json());
+	};
+
+	if (jwt && jwt.type === "Bearer") {
+		options.headers.Authorization = `${jwt.type} ${jwt.token}`;
+	}
+
+	if (data) options.body = JSON.stringify(data);
+
+	return fetch(BASE_URL + url, options).then((res) =>
+		res.headers.get("content-type").includes("application/json") ? res.json() : res.text()
+	);
 }
