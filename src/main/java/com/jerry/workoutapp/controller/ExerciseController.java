@@ -1,5 +1,6 @@
 package com.jerry.workoutapp.controller;
 
+import com.jerry.workoutapp.dto.ExerciseResponse;
 import com.jerry.workoutapp.entity.Exercise;
 import com.jerry.workoutapp.service.ExerciseService;
 import org.springframework.http.ResponseEntity;
@@ -22,8 +23,16 @@ public class ExerciseController {
 
     // GET /api/exercises/search?keyword=chest
     @GetMapping("/search")
-    public ResponseEntity<List<Exercise>> searchExercises(@RequestParam String keyword) {
-        List<Exercise> results = exerciseService.searchExercises(keyword);
-        return ResponseEntity.ok(results);
+    public ResponseEntity<List<ExerciseResponse>> searchExercises(@RequestParam String keyword) {
+        List<ExerciseResponse> exercises = exerciseService.searchExercises(keyword);
+        return ResponseEntity.ok(exercises);
+    }
+
+
+    // Get all exercises
+    @GetMapping
+    private ResponseEntity<List<ExerciseResponse>> getAllExercises() {
+        List<ExerciseResponse> exercises = exerciseService.getAllExercises();
+        return ResponseEntity.ok(exercises);
     }
 }
