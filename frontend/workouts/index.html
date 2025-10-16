@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="sv">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Scheman — GymSite</title>
+		<link rel="stylesheet" href="../global.css" />
+		<link rel="stylesheet" href="workouts.css" />
+	</head>
+	<body>
+		<header class="navbar">
+			<nav class="container">
+				<a href="/" class="logo">GymSite</a>
+
+				<div class="nav-items">
+					<a href="/" class="link">Hem</a>
+					<a href="../exercises.html" class="link">Övningar</a>
+					<a href="/workouts" class="link strong">Scheman</a>
+					<a href="#" class="link">Blogg</a>
+					<a href="/login" id="signInBtn" class="btn small link">Bli medlem</a>
+				</div>
+			</nav>
+		</header>
+
+		<main class="container">
+			<h1 class="title">Dina Scheman</h1>
+			<div id="workouts-list">
+				<button class="add-workout">Lägg till schema</button>
+
+				<template id="workout-template">
+					<div class="workout-wrapper">
+						<div class="workout">
+							<h2 class="workout-name">WORKOUT_NAME</h2>
+
+							<div class="workout-info">
+								<p class="badge exercise-count">EXERCISE_COUNT</p>
+								<span class="workout-expand">▼</span>
+							</div>
+						</div>
+
+						<div class="workout-exercises"></div>
+					</div>
+				</template>
+
+				<template id="workout-exercise-template">
+					<div class="exercise" draggable="true">
+						<span class="exercise-index">1</span>
+
+						<div class="exercise-wrapper">
+							<div class="exercise-header">
+								<span class="badge exercise-muscle-group">MUSCLE_GROUP</span>
+								<h3 class="exercise-name">EXERCISE_NAME</h3>
+							</div>
+
+							<div class="exercise-data">
+								<p class="exercise-data-label">Sets</p>
+								<p class="exercise-data-value exercise-sets">EXERCISE_SETS</p>
+							</div>
+							<div class="exercise-data">
+								<p class="exercise-data-label">Reps</p>
+								<p class="exercise-data-value exercise-reps">EXERCISE_REPS</p>
+							</div>
+						</div>
+					</div>
+				</template>
+			</div>
+		</main>
+
+		<footer class="page-footer container">
+			<p>© GymSite</p>
+
+			<div class="footer-links">
+				<a href="#" class="link">Om oss</a>
+				<a href="#" class="link">Kontakt</a>
+				<a href="#" class="link">Integritetspolicy</a>
+			</div>
+		</footer>
+
+		<script src="../nav.js" type="module"></script>
+		<script src="workouts.js" type="module"></script>
+	</body>
+</html>
