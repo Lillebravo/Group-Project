@@ -97,6 +97,8 @@ h3 {
 	height: 100%;
 	max-height: 0;
 	transition: max-height 0.2s ease-in-out, padding 0.2s ease-in-out;
+
+	overflow: auto;
 }
 
 .workout-exercises.active {
@@ -166,6 +168,56 @@ h3 {
 	font-size: 24px;
 	font-weight: 600;
 	margin: 0;
+}
+
+.exercise-actions {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.pen,
+.trash,
+.confirm {
+	width: 16px;
+	height: 16px;
+}
+
+.edit-exercise,
+.delete-exercise {
+	cursor: pointer;
+}
+
+.pen {
+	color: hsl(212, 100%, 72%);
+}
+
+.trash {
+	color: hsl(0, 100%, 72%);
+}
+
+.confirm {
+	color: hsl(120, 100%, 72%);
+}
+
+.delete-exercise:hover,
+.cancel-edit:hover {
+	background-color: hsl(0, 100%, 72%);
+}
+
+.edit-exercise:hover {
+	background-color: hsl(212, 100%, 72%);
+}
+
+.confirm-edit:hover {
+	background-color: hsl(120, 100%, 72%);
+}
+
+.delete-exercise:hover .trash,
+.cancel-edit:hover .trash,
+.edit-exercise:hover .pen,
+.confirm-edit:hover .confirm {
+	color: #000;
 }
 
 .workout-info {
