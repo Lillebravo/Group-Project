@@ -6,6 +6,9 @@ import com.jerry.workoutapp.service.WorkoutExerciseService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/workoutExercises")
 public class WorkoutExerciseController {
@@ -32,6 +35,15 @@ public class WorkoutExerciseController {
                 request.getReps()
         );
 
+        return ResponseEntity.ok(response);
+    }
+
+    // DELETE /api/workoutExercises/{workoutExerciseId}
+    @DeleteMapping("/{workoutExerciseId}")
+    public ResponseEntity<Map<String, String>> deleteExerciseFromWorkout(@PathVariable Long workoutExerciseId) {
+        workoutExerciseService.deleteExerciseFromWorkout(workoutExerciseId);
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Exercise deleted");
         return ResponseEntity.ok(response);
     }
 
