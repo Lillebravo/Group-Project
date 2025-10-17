@@ -12,6 +12,8 @@ import com.jerry.workoutapp.util.Validation;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 public class WorkoutExerciseService {
     private final WorkoutRepository workoutRepository;
@@ -66,6 +68,42 @@ public class WorkoutExerciseService {
                 saved.getReps(),
                 saved.getOrderIndex()
         );
+    }
+
+    //Delete exercise inside workouts by workoutExerciseId
+    @Transactional
+    public void deleteExerciseFromWorkout(Long workoutExerciseId) {
+        // Authenticate user
+        User user = workoutService.getAuthenticatedUser();
+
+        // Fetch the exercise to delete
+        WorkoutExercise exerciseToDelete = workoutExerciseRepository
+                .findById(workoutExerciseId)
+                .orElseThrow(() -> new RuntimeException("Exercise not found"));
+
+        // Validate that the exercise belongs to the user's workout
+        if (exerciseToDelete.getWorkout().getUser().getUserId() != user.getUserId()) {
+            throw new RuntimeException("You don't have permission to delete this exercise");
+        }
+
+        Long workoutId = exerciseToDelete.getWorkout().getWorkoutId();
+        Integer deletedOrderIndex = exerciseToDelete.getOrderIndex();
+
+        // Delete the exercise
+        workoutExerciseRepository.delete(exerciseToDelete);
+        workoutExerciseRepository.flush();
+
+        // Update order_index for all exercises after the deleted one
+        List<WorkoutExercise> remainingExercises = workoutExerciseRepository
+                .findByWorkout_WorkoutIdOrderByOrderIndexAsc(workoutId);
+
+        for (WorkoutExercise exercise : remainingExercises) {
+            if (exercise.getOrderIndex() > deletedOrderIndex) {
+                exercise.setOrderIndex(exercise.getOrderIndex() - 1);
+            }
+        }
+
+        workoutExerciseRepository.saveAll(remainingExercises);
     }
 
 }
