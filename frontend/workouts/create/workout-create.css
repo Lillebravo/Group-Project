@@ -1,0 +1,10 @@
+#create-workout-form {
+	width: 100%;
+	gap: 32px;
+}
+
+.workout-exercises {
+	max-height: none;
+	background-color: transparent;
+	padding: 0;
+}

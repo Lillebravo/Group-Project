@@ -63,7 +63,11 @@ async function baseFetch(url, data, method) {
 
 	if (data) options.body = JSON.stringify(data);
 
-	return fetch(BASE_URL + url, options).then((res) =>
-		res.headers.get("content-type").includes("application/json") ? res.json() : res.text()
-	);
+	return fetch(BASE_URL + url, options).then((res) => {
+		const contentType = res.headers.get("content-type");
+		if (!contentType || !contentType.includes("application/json")) {
+			return res.text();
+		}
+		return res.json();
+	});
 }

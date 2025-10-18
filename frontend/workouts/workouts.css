@@ -1,0 +1,249 @@
+.title {
+	font-size: 42px;
+	margin-bottom: 24px;
+	text-align: left;
+}
+
+h2,
+h3 {
+	margin: 0;
+}
+
+.badge {
+	width: fit-content;
+	padding: 4px 12px;
+	font-size: 75%;
+	font-weight: 700;
+	border-radius: 12px;
+	background-color: rgba(255, 255, 255, 0.1);
+	color: var(--text);
+	font-variant-numeric: tabular-nums;
+}
+
+#workouts-list {
+	display: flex;
+	flex-direction: column;
+	gap: 24px;
+	width: 100%;
+}
+
+.workout-actions {
+	display: flex;
+	gap: 16px;
+}
+
+.add-workout {
+	width: 100%;
+	text-align: center;
+	border: 2px dashed rgba(255, 255, 255, 0.1);
+	border-radius: 12px;
+	padding: 24px 0;
+
+	font-size: 16px;
+	font-weight: 600;
+	color: var(--text);
+	background-color: transparent;
+
+	cursor: pointer;
+}
+
+.add-workout:hover {
+	color: var(--accent);
+	background-color: var(--card);
+}
+
+.delete-workout {
+	width: 140px;
+
+	border: 2px solid rgba(255, 255, 255, 0.1);
+	border-radius: 12px;
+	padding: 24px 6px;
+
+	font-weight: 600;
+	color: var(--text);
+	background-color: transparent;
+
+	cursor: pointer;
+}
+
+.delete-workout:hover {
+	color: hsl(0, 100%, 72%);
+	background-color: var(--card);
+}
+
+.workout-wrapper {
+	overflow: hidden;
+}
+
+.workout {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+
+	background-color: var(--card);
+	padding: 16px 20px;
+	border-radius: 12px;
+
+	cursor: pointer;
+
+	transition: border-radius 0s ease-in-out;
+	transition-delay: 0.2s;
+}
+
+.workout:hover .workout-name {
+	color: var(--accent);
+}
+
+.workout-wrapper:has(.workout-exercises.active) .workout {
+	border-radius: 12px 12px 0 0;
+	transition: none;
+}
+
+.workout-name {
+	pointer-events: none;
+}
+
+.workout-expand {
+	pointer-events: none;
+}
+
+.workout-exercises {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+
+	background-color: var(--card);
+	border-radius: 0 0 12px 12px;
+	padding: 0px 20px;
+
+	height: 100%;
+	max-height: 0;
+	transition: max-height 0.2s ease-in-out, padding 0.2s ease-in-out;
+
+	overflow: auto;
+}
+
+.workout-exercises.active {
+	padding: 16px 20px;
+	max-height: 1000px;
+}
+
+.exercise {
+	padding: 12px 16px;
+	border-radius: 6px;
+	border: 2px dashed transparent;
+
+	display: flex;
+	align-items: center;
+	gap: 32px;
+	cursor: grab;
+
+	transition: box-shadow 0.15s ease-in-out, border-color 0.15s ease-in-out;
+}
+
+.exercise:nth-child(odd) {
+	background-color: rgba(255, 255, 255, 0.02);
+}
+
+.exercise.dragging {
+	border-color: var(--accent);
+	box-shadow: 0 0 6px 2px rgba(110, 231, 183, 0.25);
+}
+
+.exercise-index {
+	font-size: 32px;
+	font-weight: 700;
+	font-variant-numeric: tabular-nums;
+	color: var(--muted);
+	line-height: 0.9;
+}
+
+.exercise-header {
+	display: flex;
+	flex-direction: column;
+}
+
+.exercise-muscle-group {
+	font-size: 12px;
+	padding: 2px 8px;
+	color: var(--muted);
+}
+
+.exercise-wrapper {
+	display: flex;
+	align-items: center;
+	justify-content: space-around;
+	gap: 16px;
+	width: 100%;
+}
+
+.exercise-wrapper > * {
+	flex: 1;
+}
+
+.exercise-data-label {
+	margin: 0;
+	color: var(--muted);
+}
+
+.exercise-data-value {
+	font-size: 24px;
+	font-weight: 600;
+	margin: 0;
+}
+
+.exercise-actions {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.pen,
+.trash,
+.confirm {
+	width: 16px;
+	height: 16px;
+}
+
+.edit-exercise,
+.delete-exercise {
+	cursor: pointer;
+}
+
+.pen {
+	color: hsl(212, 100%, 72%);
+}
+
+.trash {
+	color: hsl(0, 100%, 72%);
+}
+
+.confirm {
+	color: hsl(120, 100%, 72%);
+}
+
+.delete-exercise:hover,
+.cancel-edit:hover {
+	background-color: hsl(0, 100%, 72%);
+}
+
+.edit-exercise:hover {
+	background-color: hsl(212, 100%, 72%);
+}
+
+.confirm-edit:hover {
+	background-color: hsl(120, 100%, 72%);
+}
+
+.delete-exercise:hover .trash,
+.cancel-edit:hover .trash,
+.edit-exercise:hover .pen,
+.confirm-edit:hover .confirm {
+	color: #000;
+}
+
+.workout-info {
+	display: flex;
+	align-items: center;
+	gap: 16px;
+}

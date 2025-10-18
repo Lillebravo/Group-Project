@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="sv">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Scheman — GymSite</title>
+		<link rel="stylesheet" href="../global.css" />
+		<link rel="stylesheet" href="workouts.css" />
+		<link rel="stylesheet" href="exercise-combobox.css" />
+	</head>
+	<body>
+		<header class="navbar">
+			<nav class="container">
+				<a href="/" class="logo">GymSite</a>
+
+				<div class="nav-items">
+					<a href="/" class="link">Hem</a>
+					<a href="../exercises.html" class="link">Övningar</a>
+					<a href="/workouts" class="link strong">Scheman</a>
+					<a href="#" class="link">Blogg</a>
+					<a href="/login" id="signInBtn" class="btn small link">Bli medlem</a>
+				</div>
+			</nav>
+		</header>
+
+		<main class="container">
+			<h1 class="title">Dina Scheman</h1>
+			<div id="workouts-list">
+				<template id="workout-template">
+					<div class="workout-wrapper">
+						<div class="workout">
+							<h2 class="workout-name">WORKOUT_NAME</h2>
+
+							<div class="workout-info">
+								<p class="badge exercise-count">EXERCISE_COUNT</p>
+								<span class="workout-expand">▼</span>
+							</div>
+						</div>
+
+						<div class="workout-exercises"></div>
+					</div>
+				</template>
+
+				<template id="workout-exercise-template">
+					<div class="exercise" draggable="true">
+						<span class="exercise-index">1</span>
+
+						<div class="exercise-wrapper">
+							<div class="exercise-header">
+								<span class="badge exercise-muscle-group">MUSCLE_GROUP</span>
+								<h3 class="exercise-name">EXERCISE_NAME</h3>
+							</div>
+
+							<div class="exercise-data">
+								<p class="exercise-data-label">Sets</p>
+								<p class="exercise-data-value exercise-sets">EXERCISE_SETS</p>
+							</div>
+							<div class="exercise-data">
+								<p class="exercise-data-label">Reps</p>
+								<p class="exercise-data-value exercise-reps">EXERCISE_REPS</p>
+							</div>
+						</div>
+
+						<div class="exercise-actions">
+							<button class="btn small edit-exercise">
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									width="24"
+									height="24"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									class="pen"
+								>
+									<path
+										d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"
+									/>
+								</svg>
+							</button>
+							<button class="btn small delete-exercise">
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									width="24"
+									height="24"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									class="trash"
+								>
+									<path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" />
+									<path d="M3 6h18" />
+									<path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+								</svg>
+							</button>
+						</div>
+					</div>
+				</template>
+			</div>
+		</main>
+
+		<footer class="page-footer container">
+			<p>© GymSite</p>
+
+			<div class="footer-links">
+				<a href="#" class="link">Om oss</a>
+				<a href="#" class="link">Kontakt</a>
+				<a href="#" class="link">Integritetspolicy</a>
+			</div>
+		</footer>
+
+		<div id="add-exercise-modal" class="modal hidden">
+			<div class="modal-content">
+				<h2>Lägg till övning</h2>
+				<p id="exercise-modal-description">EXERCISE_MODAL_DESCRIPTION</p>
+
+				<form autocomplete="off" class="autocomplete">
+					<input id="exercise-input" class="input" type="text" placeholder="Sök övning" />
+					<div id="exercise-autocomplete-items" class="autocomplete-items hidden"></div>
+
+					<div class="row between" style="margin-top: 16px">
+						<input type="number" id="exercise-sets" class="input" placeholder="Sets" />
+						<input type="number" id="exercise-reps" class="input" placeholder="Reps" />
+					</div>
+
+					<div class="row between" style="margin-top: 16px">
+						<button id="close-exercise-modal" class="btn">Cancel</button>
+						<input type="submit" id="submit-exercise-modal" class="btn primary" value="Lägg till" />
+					</div>
+				</form>
+			</div>
+		</div>
+
+		<script src="../nav.js" type="module"></script>
+		<script src="workouts.js" type="module"></script>
+		<script src="exercise-combobox.js" type="module"></script>
+	</body>
+</html>
