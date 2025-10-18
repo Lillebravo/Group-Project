@@ -1,5 +1,5 @@
 # Default ignored files
-/shelf/
+/.idea/shelf/
 /workspace.xml
 # Editor-based HTTP Client requests
 /httpRequests/
@@ -8,8 +8,13 @@
 # Datasource local storage ignored files
 /dataSources/
 /dataSources.local.xml
-#Avoiding issues with different JDK versions
-/misc.xml
 /dataSources.xml
-#remove db from commits
-/workout.db
+
+# Ignore build output
+target/
+
+# Ignore IntelliJ config
+.idea/
+
+# Ignore database file
+workout.db
