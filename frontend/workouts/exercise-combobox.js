@@ -41,6 +41,7 @@ exerciseInput.addEventListener("input", async (e) => {
 			currentName = exercise.name;
 
 			input.dataset.exerciseId = exercise.exerciseId;
+			input.dataset.muscleGroup = exercise.muscleGroup;
 
 			autocompleteItems.innerHTML = "";
 			autocompleteItems.classList.add("hidden");

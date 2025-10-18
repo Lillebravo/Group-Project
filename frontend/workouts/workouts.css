@@ -27,11 +27,14 @@ h3 {
 	width: 100%;
 }
 
-.add-workout {
+.workout-actions {
 	display: flex;
-	justify-content: center;
-	align-items: center;
+	gap: 16px;
+}
 
+.add-workout {
+	width: 100%;
+	text-align: center;
 	border: 2px dashed rgba(255, 255, 255, 0.1);
 	border-radius: 12px;
 	padding: 24px 0;
@@ -46,6 +49,25 @@ h3 {
 
 .add-workout:hover {
 	color: var(--accent);
+	background-color: var(--card);
+}
+
+.delete-workout {
+	width: 140px;
+
+	border: 2px solid rgba(255, 255, 255, 0.1);
+	border-radius: 12px;
+	padding: 24px 6px;
+
+	font-weight: 600;
+	color: var(--text);
+	background-color: transparent;
+
+	cursor: pointer;
+}
+
+.delete-workout:hover {
+	color: hsl(0, 100%, 72%);
 	background-color: var(--card);
 }
 

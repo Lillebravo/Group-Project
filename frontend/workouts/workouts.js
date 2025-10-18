@@ -1,24 +1,19 @@
 import { getRequest, getJwtTokenInfo, putRequest, postRequest, deleteRequest } from "../api.js";
+import { emptyImg, isElementBefore } from "../utils.js";
 
 const html = String.raw;
 
 const mainElement = document.querySelector("main");
 const workoutTemplate = document.querySelector("#workout-template");
 const exerciseTemplate = document.querySelector("#workout-exercise-template");
-
 const addExerciseModal = document.querySelector("#add-exercise-modal");
-const addWorkoutModal = document.querySelector("#add-workout-modal");
+const workoutsList = document.querySelector("#workouts-list");
 
 let dragging = null;
 let currentlyEditingExercise = false;
 
-const emptyImg = new Image();
-emptyImg.src = "data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs=";
-
 async function makeWorkoutsList() {
 	const workouts = await getRequest("/workouts/user");
-
-	const workoutsList = document.querySelector("#workouts-list");
 
 	// clean up previous workouts
 	workoutsList.querySelectorAll(".workout-wrapper").forEach((workout) => workout.remove());
@@ -34,21 +29,33 @@ async function makeWorkoutsList() {
 			exercisesList.appendChild(exerciseElement);
 		}
 
+		const actionWrapper = document.createElement("div");
+		actionWrapper.classList.add("workout-actions");
+
 		const addExerciseBtn = document.createElement("button");
 		addExerciseBtn.textContent = "Lägg till övning";
 		addExerciseBtn.classList.add("add-workout");
 		addExerciseBtn.addEventListener("click", () => {
 			addExercise(workout);
 		});
-		exercisesList.appendChild(addExerciseBtn);
+
+		const deleteWorkoutBtn = document.createElement("button");
+		deleteWorkoutBtn.textContent = "Ta bort schema";
+		deleteWorkoutBtn.classList.add("delete-workout");
+		deleteWorkoutBtn.addEventListener("click", () => {
+			deleteWorkout(workout);
+		});
+
+		actionWrapper.append(addExerciseBtn, deleteWorkoutBtn);
+		exercisesList.appendChild(actionWrapper);
 
 		workoutsList.appendChild(workoutElement);
 	}
 
-	const addWorkoutBtn = document.createElement("button");
+	const addWorkoutBtn = document.createElement("a");
+	addWorkoutBtn.href = "/workouts/create";
 	addWorkoutBtn.textContent = "Lägg till schema";
-	addWorkoutBtn.classList.add("add-workout");
-	addWorkoutBtn.addEventListener("click", addWorkout);
+	addWorkoutBtn.classList.add("add-workout", "link");
 	workoutsList.appendChild(addWorkoutBtn);
 }
 
@@ -100,6 +107,20 @@ function makeExercise(workout, exercise) {
 	});
 
 	return exerciseElement;
+}
+
+async function deleteWorkout(workout) {
+	const confirmation = confirm(`Är du säker på att du vill ta bort ${workout.name}?`);
+	if (!confirmation) return;
+
+	const response = await deleteRequest(`/workouts/${workout.workoutId}`);
+
+	if (response.error) {
+		alert(response.error);
+		return;
+	}
+
+	workoutsList.querySelector(`.workout-wrapper[data-id="${workout.workoutId}"]`).remove();
 }
 
 async function deleteExercise(exercise, workout, exerciseElement) {
@@ -233,10 +254,6 @@ async function editExercise(exercise, workout, exerciseElement) {
 	});
 }
 
-function addWorkout() {
-	// TODO: add workout
-}
-
 function addExercise(workout) {
 	addExerciseModal.querySelector(
 		"#exercise-modal-description"
@@ -254,7 +271,12 @@ addExerciseModal.querySelector("#submit-exercise-modal").addEventListener("click
 	const exerciseSets = addExerciseModal.querySelector("#exercise-sets");
 	const exerciseReps = addExerciseModal.querySelector("#exercise-reps");
 
-	if (!exerciseInput.value || !exerciseSets.value || !exerciseReps.value) {
+	if (
+		!exerciseInput.value ||
+		!exerciseInput.dataset.exerciseId ||
+		!exerciseSets.value ||
+		!exerciseReps.value
+	) {
 		alert("Fyll i alla fält");
 		return;
 	}
@@ -282,6 +304,9 @@ addExerciseModal.querySelector("#submit-exercise-modal").addEventListener("click
 	);
 
 	addExerciseModal.classList.add("hidden");
+	addExerciseModal.querySelector("#exercise-input").value = "";
+	addExerciseModal.querySelector("#exercise-sets").value = "";
+	addExerciseModal.querySelector("#exercise-reps").value = "";
 
 	document.querySelector(
 		`.workout-wrapper[data-id="${workoutId}"] .exercise-count`
@@ -319,7 +344,7 @@ function dragOver(e) {
 
 	if (dragging.parentNode !== e.target.parentNode) return;
 
-	if (isBefore(dragging, e.target)) {
+	if (isElementBefore(dragging, e.target)) {
 		e.target.parentNode.insertBefore(dragging, e.target);
 	} else {
 		e.target.parentNode.insertBefore(dragging, e.target.nextSibling);
@@ -329,14 +354,18 @@ function dragOver(e) {
 async function dragEnd(e) {
 	const workoutId = dragging.dataset.workoutId;
 	const workoutExerciseId = dragging.dataset.workoutExerciseId;
-	const orderIndex = dragging.dataset.workoutExerciseId;
+	const orderIndex = dragging.dataset.orderIndex;
 
 	const exercises = document.querySelectorAll(`.exercise[data-workout-id="${workoutId}"]`);
 
 	const newOrderIndex = Array.prototype.indexOf.call(exercises, dragging);
 
 	// if order hasn't changed
-	if (newOrderIndex === orderIndex) return;
+	if (newOrderIndex == orderIndex) {
+		dragging.classList.remove("dragging");
+		dragging = null;
+		return;
+	}
 
 	await putRequest(`/workouts/${dragging.dataset.workoutId}/exercises/reorder`, {
 		workoutExerciseId,
@@ -354,16 +383,6 @@ function refreshExercisesIndex(exercises) {
 		exercise.dataset.orderIndex = index;
 		exercise.querySelectorAll(".exercise-index").forEach((el) => (el.textContent = index + 1));
 	}
-}
-
-function isBefore(el1, el2) {
-	let cur;
-	if (el2.parentNode === el1.parentNode) {
-		for (cur = el1.previousSibling; cur; cur = cur.previousSibling) {
-			if (cur === el2) return true;
-		}
-	}
-	return false;
 }
 
 // if not logged in
