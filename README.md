@@ -17,6 +17,7 @@ Få påminnelser för schemalagda träningspass
 🗂️ Tabeller
 users
 Användarkonton i systemet.
+```
 - id (PK)
 - email
 - password_hash
