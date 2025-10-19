@@ -291,6 +291,9 @@ WHERE wl.workout_id = [Push A ID]
   AND wl.user_id = [user ID]
 ORDER BY wl.completed_at DESC
 LIMIT 1
+
+---
+
 Hitta PR för bänkpress på 12 reps
 sqlSELECT MAX(weight) as pr_weight, completed_at
 FROM workout_exercise_logs wel
@@ -304,6 +307,9 @@ FROM exercises e
 JOIN user_exercise_preferences uep ON e.id = uep.exercise_id
 WHERE uep.user_id = [user ID]
   AND uep.is_favourite = true
+
+---
+
 Hämta alla övningar användaren ska se
 sqlSELECT e.* 
 FROM exercises e
