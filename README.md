@@ -4,8 +4,8 @@
 ---
 
 **Databasstruktur**
-📋 Översikt
-Denna databas hanterar ett komplett träningssystem där användare kan:
+##📋 Översikt
+**Denna databas hanterar ett komplett träningssystem där användare kan:**
 
 Skapa och följa träningsrutiner
 Logga träningspass med detaljerad information per set
