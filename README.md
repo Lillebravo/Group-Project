@@ -326,3 +326,447 @@ Snooze-funktion för påminnelser
 Community-features (dela routines/workouts)
 Kroppsstatistik (vikt, kroppsfett, mått)
 Nutrition tracking
+```
+
+-- ============================================
+-- SKAPA TABELLER
+-- ============================================
+
+-- 1. Users
+CREATE TABLE users (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    push_notifications_enabled BOOLEAN DEFAULT true,
+    notification_method ENUM('push', 'email', 'both') DEFAULT 'push',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 2. Exercises (globala övningar)
+CREATE TABLE exercises (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(100) NOT NULL,
+    description TEXT,
+    category VARCHAR(50),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 3. User Exercise Preferences
+CREATE TABLE user_exercise_preferences (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT NOT NULL,
+    exercise_id INT NOT NULL,
+    is_favourite BOOLEAN DEFAULT false,
+    is_custom BOOLEAN DEFAULT false,
+    default_weight DECIMAL(5,2),
+    default_rest_time INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (exercise_id) REFERENCES exercises(id) ON DELETE CASCADE,
+    UNIQUE KEY unique_user_exercise (user_id, exercise_id)
+);
+
+-- 4. Routines
+CREATE TABLE routines (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    description TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- 5. Workouts
+CREATE TABLE workouts (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- 6. Routine Workouts (junction table)
+CREATE TABLE routine_workouts (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    routine_id INT NOT NULL,
+    workout_id INT NOT NULL,
+    day_order INT NOT NULL,
+    week_day VARCHAR(20),
+    reminder_time TIME,
+    reminder_enabled BOOLEAN DEFAULT true,
+    FOREIGN KEY (routine_id) REFERENCES routines(id) ON DELETE CASCADE,
+    FOREIGN KEY (workout_id) REFERENCES workouts(id) ON DELETE CASCADE
+);
+
+-- 7. Workout Exercises
+CREATE TABLE workout_exercises (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    workout_id INT NOT NULL,
+    exercise_id INT NOT NULL,
+    rest_time INT DEFAULT 60,
+    order_in_workout INT NOT NULL,
+    FOREIGN KEY (workout_id) REFERENCES workouts(id) ON DELETE CASCADE,
+    FOREIGN KEY (exercise_id) REFERENCES exercises(id) ON DELETE CASCADE
+);
+
+-- 8. Workout Exercise Sets
+CREATE TABLE workout_exercise_sets (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    workout_exercise_id INT NOT NULL,
+    set_number INT NOT NULL,
+    target_reps INT NOT NULL,
+    target_weight DECIMAL(5,2) NOT NULL,
+    FOREIGN KEY (workout_exercise_id) REFERENCES workout_exercises(id) ON DELETE CASCADE
+);
+
+-- 9. Workout Logs
+CREATE TABLE workout_logs (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT NOT NULL,
+    workout_id INT NOT NULL,
+    routine_id INT,
+    routine_day INT,
+    started_at DATETIME NOT NULL,
+    completed_at DATETIME,
+    duration_minutes INT,
+    notes TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (workout_id) REFERENCES workouts(id) ON DELETE CASCADE,
+    FOREIGN KEY (routine_id) REFERENCES routines(id) ON DELETE SET NULL
+);
+
+-- 10. Workout Exercise Logs
+CREATE TABLE workout_exercise_logs (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    workout_log_id INT NOT NULL,
+    exercise_id INT NOT NULL,
+    set_number INT NOT NULL,
+    weight DECIMAL(5,2) NOT NULL,
+    reps INT NOT NULL,
+    estimated_1rm DECIMAL(5,2),
+    notes TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (workout_log_id) REFERENCES workout_logs(id) ON DELETE CASCADE,
+    FOREIGN KEY (exercise_id) REFERENCES exercises(id) ON DELETE CASCADE
+);
+
+-- ============================================
+-- LÄGG TILL INDEX FÖR BÄTTRE PRESTANDA
+-- ============================================
+
+CREATE INDEX idx_user_exercise_prefs_user ON user_exercise_preferences(user_id);
+CREATE INDEX idx_user_exercise_prefs_exercise ON user_exercise_preferences(exercise_id);
+CREATE INDEX idx_routines_user ON routines(user_id);
+CREATE INDEX idx_workouts_user ON workouts(user_id);
+CREATE INDEX idx_workout_exercises_workout ON workout_exercises(workout_id);
+CREATE INDEX idx_workout_exercises_exercise ON workout_exercises(exercise_id);
+CREATE INDEX idx_workout_logs_user ON workout_logs(user_id);
+CREATE INDEX idx_workout_logs_workout ON workout_logs(workout_id);
+CREATE INDEX idx_workout_logs_completed ON workout_logs(completed_at);
+CREATE INDEX idx_workout_exercise_logs_workout_log ON workout_exercise_logs(workout_log_id);
+CREATE INDEX idx_workout_exercise_logs_exercise ON workout_exercise_logs(exercise_id);
+
+-- ============================================
+-- TESTDATA
+-- ============================================
+
+-- Lägg till testanvändare
+INSERT INTO users (email, password_hash, name, push_notifications_enabled, notification_method) VALUES
+('test@example.com', '$2y$10$abcdefghijklmnopqrstuv', 'Test Användare', true, 'push'),
+('anna@example.com', '$2y$10$abcdefghijklmnopqrstuv', 'Anna Andersson', true, 'both'),
+('erik@example.com', '$2y$10$abcdefghijklmnopqrstuv', 'Erik Eriksson', false, 'email');
+
+-- Lägg till 20 globala övningar
+INSERT INTO exercises (name, description, category) VALUES
+-- CHEST (Bröst) - 8 övningar
+INSERT INTO exercises (name, description, category) VALUES
+('Barbell Bench Press', 'Lie on a bench and press barbell from chest upward', 'Chest'),
+('Incline Barbell Bench Press', 'Bench press on inclined bench (30-45 degrees) for upper chest', 'Chest'),
+('Decline Barbell Bench Press', 'Bench press on declined bench for lower chest', 'Chest'),
+('Dumbbell Bench Press', 'Bench press with dumbbells for greater range of motion', 'Chest'),
+('Incline Dumbbell Press', 'Dumbbell press on inclined bench', 'Chest'),
+('Chest Dips', 'Dips between parallel bars with forward lean', 'Chest'),
+('Cable Flyes', 'Chest flyes with cables for constant tension', 'Chest'),
+('Dumbbell Flyes', 'Lying dumbbell flyes on flat bench', 'Chest'),
+
+-- BACK (Rygg) - 10 övningar
+('Conventional Deadlift', 'Lift barbell from floor to standing position', 'Back'),
+('Sumo Deadlift', 'Deadlift with wide stance', 'Back'),
+('Pull-ups', 'Hang from bar and pull body up until chin over bar', 'Back'),
+('Chin-ups', 'Pull-ups with underhand grip', 'Back'),
+('Barbell Rows', 'Bent over row with barbell', 'Back'),
+('Dumbbell Rows', 'Single arm row with dumbbell', 'Back'),
+('T-Bar Rows', 'Row with T-bar for thick back', 'Back'),
+('Lat Pulldown', 'Pull bar down to chest in cable machine', 'Back'),
+('Seated Cable Rows', 'Horizontal row in cable machine', 'Back'),
+('Face Pulls', 'Cable pull to face for rear delts and upper back', 'Back'),
+
+-- LEGS (Ben) - 12 övningar
+('Barbell Back Squats', 'Deep squat with barbell on back', 'Legs'),
+('Front Squats', 'Squats with barbell on front delts', 'Legs'),
+('Bulgarian Split Squats', 'Single leg squats with rear foot elevated', 'Legs'),
+('Leg Press', 'Press weight with legs in machine', 'Legs'),
+('Romanian Deadlift', 'Stiff leg deadlift for hamstrings and glutes', 'Legs'),
+('Leg Curls', 'Lying or seated hamstring curls', 'Legs'),
+('Leg Extensions', 'Quad extensions in machine', 'Legs'),
+('Walking Lunges', 'Forward lunges with dumbbells', 'Legs'),
+('Hip Thrusts', 'Barbell hip thrusts for glutes', 'Legs'),
+('Glute Kickbacks', 'Cable kickbacks for glutes', 'Legs'),
+('Standing Calf Raises', 'Calf raises standing in machine', 'Legs'),
+('Seated Calf Raises', 'Calf raises seated for soleus', 'Legs'),
+
+-- SHOULDERS (Axlar) - 8 övningar
+('Overhead Press', 'Standing shoulder press with barbell', 'Shoulders'),
+('Seated Dumbbell Press', 'Seated shoulder press with dumbbells', 'Shoulders'),
+('Arnold Press', 'Shoulder press with rotation of wrists', 'Shoulders'),
+('Lateral Raises', 'Lift dumbbells out to sides for side delts', 'Shoulders'),
+('Front Raises', 'Lift dumbbells forward for front delts', 'Shoulders'),
+('Rear Delt Flyes', 'Bent over flyes for rear delts', 'Shoulders'),
+('Cable Lateral Raises', 'Lateral raises with cable', 'Shoulders'),
+('Upright Rows', 'Pull barbell up to chin', 'Shoulders'),
+
+-- ARMS - Biceps (5 övningar)
+('Barbell Curls', 'Bicep curls with barbell', 'Arms'),
+('Dumbbell Curls', 'Alternating or simultaneous bicep curls', 'Arms'),
+('Hammer Curls', 'Bicep curls with neutral grip', 'Arms'),
+('Preacher Curls', 'Bicep curls on preacher bench', 'Arms'),
+('Cable Curls', 'Bicep curls with cable for constant tension', 'Arms'),
+
+-- ARMS - Triceps (5 övningar)
+('Triceps Pushdown', 'Push down rope or bar in cable machine', 'Arms'),
+('Overhead Triceps Extension', 'Overhead dumbbell extension for triceps', 'Arms'),
+('Skull Crushers', 'Lying triceps extensions with barbell', 'Arms'),
+('Close-Grip Bench Press', 'Bench press with narrow grip for triceps', 'Arms'),
+('Triceps Dips', 'Dips on parallel bars for triceps', 'Arms'),
+
+-- CORE (Mage/Bål) - 10 övningar
+('Planks', 'Hold push-up position on forearms', 'Core'),
+('Side Planks', 'Plank position on one side', 'Core'),
+('Hanging Leg Raises', 'Hang from bar and raise legs', 'Core'),
+('Cable Crunches', 'Kneeling crunches with cable', 'Core'),
+('Russian Twists', 'Seated twists with weight', 'Core'),
+('Ab Wheel Rollouts', 'Roll out with ab wheel', 'Core'),
+('Dead Bugs', 'Lying alternating arm and leg extensions', 'Core'),
+('Bicycle Crunches', 'Alternating elbow to knee crunches', 'Core'),
+('Mountain Climbers', 'Running motion in plank position', 'Core'),
+('Pallof Press', 'Anti-rotation press with cable', 'Core');
+
+-- Lägg till några favoriter för testanvändare
+INSERT INTO user_exercise_preferences (user_id, exercise_id, is_favourite, default_weight, default_rest_time) VALUES
+(1, 1, true, 80.0, 180),   -- Barbell Bench Press
+(1, 20, true, 100.0, 240), -- Barbell Back Squats
+(1, 9, true, 120.0, 300),  -- Conventional Deadlift
+(1, 11, true, 0.0, 120),   -- Pull-ups
+(1, 33, true, 50.0, 150),  -- Overhead Press
+(2, 1, true, 50.0, 120),   -- Barbell Bench Press
+(2, 37, true, 15.0, 90);   -- Lateral Raises
+
+-- Skapa custom övning för testanvändare
+INSERT INTO exercises (name, description, category) VALUES
+('My Special Curls', 'My own variation of bicep curls', 'Arms');
+
+INSERT INTO user_exercise_preferences (user_id, exercise_id, is_custom, is_favourite) VALUES
+(1, 61, true, true);
+
+-- Uppdatera workouts med nya övningar
+DELETE FROM workout_exercise_sets;
+DELETE FROM workout_exercises;
+
+-- Push A övningar (uppdaterad med rätt IDs)
+INSERT INTO workout_exercises (workout_id, exercise_id, rest_time, order_in_workout) VALUES
+(1, 1, 180, 1),   -- Barbell Bench Press
+(1, 2, 150, 2),   -- Incline Barbell Bench Press
+(1, 6, 120, 3),   -- Chest Dips
+(1, 33, 150, 4),  -- Overhead Press
+(1, 37, 60, 5),   -- Lateral Raises
+(1, 43, 90, 6);   -- Triceps Pushdown
+
+-- Pull A övningar
+INSERT INTO workout_exercises (workout_id, exercise_id, rest_time, order_in_workout) VALUES
+(2, 9, 300, 1),   -- Conventional Deadlift
+(2, 11, 180, 2),  -- Pull-ups
+(2, 13, 150, 3),  -- Barbell Rows
+(2, 16, 120, 4),  -- Lat Pulldown
+(2, 19, 90, 5),   -- Face Pulls
+(2, 41, 60, 6);   -- Barbell Curls
+
+-- Legs A övningar
+INSERT INTO workout_exercises (workout_id, exercise_id, rest_time, order_in_workout) VALUES
+(3, 20, 240, 1),  -- Barbell Back Squats
+(3, 24, 180, 2),  -- Romanian Deadlift
+(3, 23, 150, 3),  -- Leg Press
+(3, 27, 120, 4),  -- Walking Lunges
+(3, 28, 120, 5),  -- Hip Thrusts
+(3, 30, 60, 6);   -- Standing Calf Raises
+
+-- Lägg till sets för Push A övningar
+-- Barbell Bench Press
+INSERT INTO workout_exercise_sets (workout_exercise_id, set_number, target_reps, target_weight) VALUES
+(1, 1, 12, 80.0),
+(1, 2, 12, 80.0),
+(1, 3, 12, 80.0);
+
+-- Incline Barbell Bench Press
+INSERT INTO workout_exercise_sets (workout_exercise_id, set_number, target_reps, target_weight) VALUES
+(2, 1, 10, 70.0),
+(2, 2, 10, 70.0),
+(2, 3, 10, 70.0);
+
+-- Chest Dips
+INSERT INTO workout_exercise_sets (workout_exercise_id, set_number, target_reps, target_weight) VALUES
+(3, 1, 12, 0.0),
+(3, 2, 12, 0.0),
+(3, 3, 12, 0.0);
+
+-- Overhead Press
+INSERT INTO workout_exercise_sets (workout_exercise_id, set_number, target_reps, target_weight) VALUES
+(4, 1, 10, 50.0),
+(4, 2, 10, 50.0),
+(4, 3, 10, 50.0);
+
+-- Lateral Raises
+INSERT INTO workout_exercise_sets (workout_exercise_id, set_number, target_reps, target_weight) VALUES
+(5, 1, 15, 10.0),
+(5, 2, 15, 10.0),
+(5, 3, 15, 10.0);
+
+-- Triceps Pushdown
+INSERT INTO workout_exercise_sets (workout_exercise_id, set_number, target_reps, target_weight) VALUES
+(6, 1, 15, 30.0),
+(6, 2, 15, 30.0),
+(6, 3, 15, 30.0);
+
+-- Lägg till sets för Pull A
+-- Conventional Deadlift
+INSERT INTO workout_exercise_sets (workout_exercise_id, set_number, target_reps, target_weight) VALUES
+(7, 1, 5, 140.0),
+(7, 2, 5, 140.0),
+(7, 3, 5, 140.0);
+
+-- Pull-ups
+INSERT INTO workout_exercise_sets (workout_exercise_id, set_number, target_reps, target_weight) VALUES
+(8, 1, 10, 0.0),
+(8, 2, 10, 0.0),
+(8, 3, 10, 0.0);
+
+-- Barbell Rows
+INSERT INTO workout_exercise_sets (workout_exercise_id, set_number, target_reps, target_weight) VALUES
+(9, 1, 10, 70.0),
+(9, 2, 10, 70.0),
+(9, 3, 10, 70.0);
+
+-- Lat Pulldown
+INSERT INTO workout_exercise_sets (workout_exercise_id, set_number, target_reps, target_weight) VALUES
+(10, 1, 12, 60.0),
+(10, 2, 12, 60.0),
+(10, 3, 12, 60.0);
+
+-- Face Pulls
+INSERT INTO workout_exercise_sets (workout_exercise_id, set_number, target_reps, target_weight) VALUES
+(11, 1, 15, 20.0),
+(11, 2, 15, 20.0),
+(11, 3, 15, 20.0);
+
+-- Barbell Curls
+INSERT INTO workout_exercise_sets (workout_exercise_id, set_number, target_reps, target_weight) VALUES
+(12, 1, 12, 30.0),
+(12, 2, 12, 30.0),
+(12, 3, 12, 30.0);
+
+-- Lägg till sets för Legs A
+-- Barbell Back Squats
+INSERT INTO workout_exercise_sets (workout_exercise_id, set_number, target_reps, target_weight) VALUES
+(13, 1, 10, 100.0),
+(13, 2, 10, 100.0),
+(13, 3, 10, 100.0);
+
+-- Romanian Deadlift
+INSERT INTO workout_exercise_sets (workout_exercise_id, set_number, target_reps, target_weight) VALUES
+(14, 1, 10, 80.0),
+(14, 2, 10, 80.0),
+(14, 3, 10, 80.0);
+
+-- Leg Press
+INSERT INTO workout_exercise_sets (workout_exercise_id, set_number, target_reps, target_weight) VALUES
+(15, 1, 12, 150.0),
+(15, 2, 12, 150.0),
+(15, 3, 12, 150.0);
+
+-- Walking Lunges
+INSERT INTO workout_exercise_sets (workout_exercise_id, set_number, target_reps, target_weight) VALUES
+(16, 1, 20, 20.0),
+(16, 2, 20, 20.0);
+
+-- Hip Thrusts
+INSERT INTO workout_exercise_sets (workout_exercise_id, set_number, target_reps, target_weight) VALUES
+(17, 1, 12, 80.0),
+(17, 2, 12, 80.0),
+(17, 3, 12, 80.0);
+
+-- Standing Calf Raises
+INSERT INTO workout_exercise_sets (workout_exercise_id, set_number, target_reps, target_weight) VALUES
+(18, 1, 15, 60.0),
+(18, 2, 15, 60.0),
+(18, 3, 15, 60.0);
+
+-- Uppdatera loggade övningar med rätt exercise IDs
+DELETE FROM workout_exercise_logs;
+
+-- Logga Barbell Bench Press
+INSERT INTO workout_exercise_logs (workout_log_id, exercise_id, set_number, weight, reps, estimated_1rm) VALUES
+(1, 1, 1, 80.0, 13, 80.0 * (1 + 13/30)),
+(1, 1, 2, 80.0, 12, 80.0 * (1 + 12/30)),
+(1, 1, 3, 80.0, 12, 80.0 * (1 + 12/30));
+
+-- Logga Incline Barbell Bench Press
+INSERT INTO workout_exercise_logs (workout_log_id, exercise_id, set_number, weight, reps, estimated_1rm) VALUES
+(1, 2, 1, 70.0, 10, 70.0 * (1 + 10/30)),
+(1, 2, 2, 70.0, 10, 70.0 * (1 + 10/30)),
+(1, 2, 3, 70.0, 9, 70.0 * (1 + 9/30));
+
+-- Logga Chest Dips
+INSERT INTO workout_exercise_logs (workout_log_id, exercise_id, set_number, weight, reps, estimated_1rm) VALUES
+(1, 6, 1, 0.0, 12, 0.0),
+(1, 6, 2, 0.0, 12, 0.0),
+(1, 6, 3, 0.0, 11, 0.0);
+
+-- ============================================
+-- VERIFIERA INSTALLATION
+-- ============================================
+
+-- Se alla övningar per kategori
+SELECT category, COUNT(*) as antal 
+FROM exercises 
+GROUP BY category 
+ORDER BY antal DESC;
+
+-- Se alla övningar (sorterade)
+SELECT id, name, category FROM exercises ORDER BY category, name;
+
+-- Total antal övningar
+SELECT COUNT(*) as total_ovningar FROM exercises;
+
+-- Se Push A workout med alla övningar
+SELECT 
+    w.name as workout, 
+    e.name as exercise, 
+    e.category,
+    we.order_in_workout, 
+    we.rest_time,
+    COUNT(wes.id) as antal_sets
+FROM workouts w
+JOIN workout_exercises we ON w.id = we.workout_id
+JOIN exercises e ON we.exercise_id = e.id
+LEFT JOIN workout_exercise_sets wes ON we.id = wes.workout_exercise_id
+WHERE w.id = 1
+GROUP BY w.id, e.id, we.id
+ORDER BY we.order_in_workout;
+
+-- Se alla övningar per kategori (detaljerad)
+SELECT 
+    category,
+    GROUP_CONCAT(name ORDER BY name SEPARATOR ', ') as exercises
+FROM exercises
+GROUP BY category;
