@@ -1,7 +1,9 @@
 # Group-Project
-Träningsapp där varje set kan progressa individuellt, fullständig historik sparas, och användare kan bygga avancerade träningsprogram med rutiner och automatiska påminnelser.
+**Träningsapp där varje set kan progressa individuellt, fullständig historik sparas, och användare kan bygga avancerade träningsprogram med rutiner och automatiska påminnelser.**
 
-Träningsapp - Databasstruktur
+---
+
+**Databasstruktur**
 📋 Översikt
 Denna databas hanterar ett komplett träningssystem där användare kan:
 
