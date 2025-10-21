@@ -2,12 +2,15 @@ package com.jerry.workoutapp.entity;
 
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "workout_exercises")
 public class WorkoutExercise {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "workout_exercise_id", columnDefinition = "INTEGER")
+    @Column(name = "id", columnDefinition = "INTEGER")
     private Long workoutExerciseId;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -18,23 +21,37 @@ public class WorkoutExercise {
     @JoinColumn(name = "exercise_id", nullable = false)
     private Exercise exercise;
 
-    @Column(name = "sets")
-    private Integer sets;
+    @Column(name = "rest_time", columnDefinition = "INTEGER")
+    private int restTime = 60;
 
-    @Column(name = "reps")
-    private Integer reps;
+    @Column(name = "order_in_workout", columnDefinition = "INTEGER")
+    private int orderIndex;
 
-    @Column(name = "order_index")
-    private Integer orderIndex;
+    @OneToMany(mappedBy = "workoutExercise", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("setNumber ASC")
+    private List<WorkoutExerciseSet> sets = new ArrayList<>();
 
-    public WorkoutExercise() {
-    }
+    public WorkoutExercise() {}
 
-    public WorkoutExercise(Workout workout, Exercise exercise, Integer sets, Integer reps, Integer orderIndex) {
+    public WorkoutExercise(Workout workout, Exercise exercise, int orderIndex) {
         this.workout = workout;
         this.exercise = exercise;
+        this.orderIndex = orderIndex;
+    }
+
+    public WorkoutExercise(Workout workout, Exercise exercise, int restTime,
+                           int orderIndex, List<WorkoutExerciseSet> sets) {
+        this.workout = workout;
+        this.exercise = exercise;
+        this.restTime = restTime;
+        this.orderIndex = orderIndex;
         this.sets = sets;
-        this.reps = reps;
+    }
+
+    public WorkoutExercise(Workout workout, Exercise exercise, int restTime, int orderIndex) {
+        this.workout = workout;
+        this.exercise = exercise;
+        this.restTime = restTime;
         this.orderIndex = orderIndex;
     }
 
@@ -60,19 +77,8 @@ public class WorkoutExercise {
         this.exercise = exercise;
     }
 
-    public Integer getSets() {
-        return sets;
-    }
-    public void setSets(Integer sets) {
-        this.sets = sets;
-    }
-
-    public Integer getReps() {
-        return reps;
-    }
-    public void setReps(Integer reps) {
-        this.reps = reps;
-    }
+    public Integer getRestTime() { return restTime; }
+    public void setRestTime(Integer restTime) { this.restTime = restTime; }
 
     public Integer getOrderIndex() {
         return orderIndex;
@@ -80,4 +86,7 @@ public class WorkoutExercise {
     public void setOrderIndex(Integer orderIndex) {
         this.orderIndex = orderIndex;
     }
+
+    public List<WorkoutExerciseSet> getSets() { return sets; }
+    public void setSets(List<WorkoutExerciseSet> sets) { this.sets = sets; }
 }

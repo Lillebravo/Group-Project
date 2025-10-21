@@ -18,15 +18,14 @@ public class ExerciseService {
 
     public List<ExerciseResponse> searchExercises(String keyword) {
         List<Exercise> exercises = exerciseRepository
-                .findByNameContainingIgnoreCaseOrMuscleGroupContainingIgnoreCase(keyword, keyword);
+                .findByNameContainingIgnoreCaseOrCategoryContainingIgnoreCase(keyword, keyword);
 
         return exercises.stream()
                 .map(ex -> new ExerciseResponse(
                         ex.getExerciseId(),
                         ex.getName(),
                         ex.getDescription(),
-                        ex.getMuscleGroup(),
-                        ex.getEquipment()
+                        ex.getCategory()
                 ))
                 .collect(Collectors.toList());
     }
@@ -39,8 +38,7 @@ public class ExerciseService {
                         ex.getExerciseId(),
                         ex.getName(),
                         ex.getDescription(),
-                        ex.getMuscleGroup(),
-                        ex.getEquipment()
+                        ex.getCategory()
                 ))
                 .collect(Collectors.toList());
     }

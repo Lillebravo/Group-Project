@@ -1,6 +1,7 @@
 package com.jerry.workoutapp.entity;
 
 public class SignUpRequest {
+
     private String email;
     private String password;
 
@@ -9,6 +10,7 @@ public class SignUpRequest {
         this.password = password;
     }
 
+    // Getters and Setters
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
 

@@ -22,7 +22,7 @@ public class WorkoutController {
 
     // Create a new workout for a user
     // POST /api/workouts
-    // Request body contains userId and workout name
+    // Request body contains workout name
     @PostMapping
     public ResponseEntity<WorkoutResponse> createWorkout(@RequestBody CreateWorkoutRequest request) {
         WorkoutResponse response = workoutService.createWorkout(request.getName());
@@ -39,7 +39,7 @@ public class WorkoutController {
 
     // Add an exercise to a specific workout by its ID
     // POST /api/workouts/1/exercises
-    // Request body contains exerciseId, sets, reps, and orderIndex.
+    // Request body contains exerciseId, restTime, orderIndex, and sets array
     @PostMapping("/{workoutId}/exercises")
     public ResponseEntity<WorkoutResponse> addExerciseToWorkout(
             @PathVariable Long workoutId,
@@ -47,9 +47,9 @@ public class WorkoutController {
         WorkoutResponse updatedWorkout = workoutService.addExerciseToWorkout(
                 workoutId,
                 request.getExerciseId(),
-                request.getSets(),
-                request.getReps(),
-                request.getOrderIndex()
+                request.getRestTime(),
+                request.getOrderIndex(),
+                request.getSets()
         );
         return ResponseEntity.ok(updatedWorkout);
     }
@@ -68,11 +68,10 @@ public class WorkoutController {
     }
 
     // Delete workout method
-    // DELETE /api/workouts/{workoutId
+    // DELETE /api/workouts/{workoutId}
     @DeleteMapping("/{workoutId}")
     public ResponseEntity<Void> deleteWorkout(@PathVariable Long workoutId){
         workoutService.deleteWorkout(workoutId);
         return ResponseEntity.ok().build();
     }
-
 }

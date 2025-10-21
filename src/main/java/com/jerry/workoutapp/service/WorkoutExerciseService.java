@@ -1,13 +1,11 @@
 package com.jerry.workoutapp.service;
 
 import com.jerry.workoutapp.dto.WorkoutExerciseResponse;
+import com.jerry.workoutapp.dto.WorkoutExerciseSetResponse;
 import com.jerry.workoutapp.entity.User;
-import com.jerry.workoutapp.entity.Workout;
 import com.jerry.workoutapp.entity.WorkoutExercise;
-import com.jerry.workoutapp.repository.ExerciseRepository;
-import com.jerry.workoutapp.repository.UserRepository;
-import com.jerry.workoutapp.repository.WorkoutExerciseRepository;
-import com.jerry.workoutapp.repository.WorkoutRepository;
+import com.jerry.workoutapp.entity.WorkoutExerciseSet;
+import com.jerry.workoutapp.repository.*;
 import com.jerry.workoutapp.util.Validation;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,54 +18,95 @@ public class WorkoutExerciseService {
     private final UserRepository userRepository;
     private final ExerciseRepository exerciseRepository;
     private final WorkoutExerciseRepository workoutExerciseRepository;
+    private final WorkoutExerciseSetRepository workoutExerciseSetRepository;
     private final Validation validation;
     private final WorkoutService workoutService;
 
-
-
-    public WorkoutExerciseService(WorkoutRepository workoutRepository, UserRepository userRepository, ExerciseRepository exerciseRepository, WorkoutExerciseRepository workoutExerciseRepository, Validation validation, WorkoutService workoutService) {
+    public WorkoutExerciseService(WorkoutRepository workoutRepository,
+                                  UserRepository userRepository,
+                                  ExerciseRepository exerciseRepository,
+                                  WorkoutExerciseRepository workoutExerciseRepository,
+                                  WorkoutExerciseSetRepository workoutExerciseSetRepository,
+                                  Validation validation, WorkoutService workoutService) {
         this.workoutRepository = workoutRepository;
         this.userRepository = userRepository;
         this.exerciseRepository = exerciseRepository;
         this.workoutExerciseRepository = workoutExerciseRepository;
+        this.workoutExerciseSetRepository = workoutExerciseSetRepository;
         this.validation = validation;
         this.workoutService = workoutService;
     }
 
-    // Update sets and reps for a specific exercise in a workout
+    // UPDATED: Now we update one specific set
     @Transactional
-    public WorkoutExerciseResponse updateSetsAndReps(Long workoutId, Long exerciseId, Integer newSets, Integer newReps) {
-
+    public WorkoutExerciseSetResponse updateSet(Long workoutExerciseId, Integer setNumber,
+                                                Integer newReps, Double newWeight) {
         // Authenticate user
         User user = workoutService.getAuthenticatedUser();
 
+        // Fetch WorkoutExercise
         WorkoutExercise workoutExercise = workoutExerciseRepository
-                .findByWorkout_WorkoutIdAndExercise_ExerciseIdAndWorkout_User_UserId(workoutId, exerciseId, user.getUserId())
-                .orElseThrow(() -> new RuntimeException("Exercise not found in this workout"));
+                .findById(workoutExerciseId)
+                .orElseThrow(() -> new RuntimeException("Exercise not found"));
 
-        // Validate new sets and reps
-        if (newSets != null) {
-            validation.validateInteger(newSets, "Sets", true, 1, null, "Sets måste vara minst 1");
-            workoutExercise.setSets(newSets);
+        // Verify ownership
+        if (workoutExercise.getWorkout().getUser().getUserId() != user.getUserId()) {
+            throw new RuntimeException("You don't have permission to modify this exercise");
         }
 
+        // Find the specific set
+        WorkoutExerciseSet set = workoutExercise.getSets().stream()
+                .filter(s -> s.getSetNumber().equals(setNumber))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Set " + setNumber + " not found"));
+
+        // Validate and update
         if (newReps != null) {
             validation.validateInteger(newReps, "Reps", true, 1, null, "Reps måste vara minst 1");
-            workoutExercise.setReps(newReps);
+            set.setTargetReps(newReps);
+        }
+
+        if (newWeight != null) {
+            if (newWeight < 0) {
+                throw new RuntimeException("Weight cannot be negative");
+            }
+            set.setTargetWeight(newWeight);
+        }
+
+        WorkoutExerciseSet saved = workoutExerciseSetRepository.save(set);
+
+        // Return DTO
+        return new WorkoutExerciseSetResponse(
+                saved.getId(),
+                saved.getWorkoutExercise().getWorkoutExerciseId(),
+                saved.getSetNumber(),
+                saved.getTargetReps(),
+                saved.getTargetWeight()
+        );
+    }
+
+    @Transactional
+    public WorkoutExerciseResponse updateRestTime(Long workoutExerciseId, Integer newRestTime) {
+        User user = workoutService.getAuthenticatedUser();
+
+        WorkoutExercise workoutExercise = workoutExerciseRepository
+                .findById(workoutExerciseId)
+                .orElseThrow(() -> new RuntimeException("Exercise not found"));
+
+        // Verify ownership
+        if (workoutExercise.getWorkout().getUser().getUserId() != user.getUserId()) {
+            throw new RuntimeException("You don't have permission to modify this exercise");
+        }
+
+        if (newRestTime != null) {
+            validation.validateInteger(newRestTime, "Rest time", true, 0, null,
+                    "Rest time must be 0 or greater");
+            workoutExercise.setRestTime(newRestTime);
         }
 
         WorkoutExercise saved = workoutExerciseRepository.save(workoutExercise);
 
-        // Return DTO with updated values
-        return new WorkoutExerciseResponse(
-                saved.getWorkoutExerciseId(),
-                saved.getExercise().getExerciseId(),
-                saved.getExercise().getName(),
-                saved.getExercise().getMuscleGroup(),
-                saved.getSets(),
-                saved.getReps(),
-                saved.getOrderIndex()
-        );
+        return convertToResponse(saved);
     }
 
     //Delete exercise inside workouts by workoutExerciseId
@@ -104,6 +143,19 @@ public class WorkoutExerciseService {
         }
 
         workoutExerciseRepository.saveAll(remainingExercises);
+    }
+
+    // Helper method to convertert to DTO
+    private WorkoutExerciseResponse convertToResponse(WorkoutExercise we) {
+        return new WorkoutExerciseResponse(
+                we.getWorkoutExerciseId(),
+                we.getExercise().getExerciseId(),
+                we.getExercise().getName(),
+                we.getExercise().getCategory(),
+                we.getRestTime(),
+                we.getSets().size(), // number of sets
+                we.getOrderIndex()
+        );
     }
 
 }

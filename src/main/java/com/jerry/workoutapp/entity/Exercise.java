@@ -2,12 +2,14 @@ package com.jerry.workoutapp.entity;
 
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "exercises")
 public class Exercise {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "exercise_id", columnDefinition = "INTEGER")
+    @Column(name = "id", columnDefinition = "INTEGER")
     private Long exerciseId;
 
     @Column(name = "name")
@@ -16,27 +18,22 @@ public class Exercise {
     @Column(name = "description")
     private String description;
 
-    @Column(name = "muscle_group")
-    private String muscleGroup;
+    @Column(name = "category")
+    private String category;
 
-    @Column(name = "equipment")
-    private String equipment;
-
-    @Column(name = "source")
-    private String source;
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
 
 
-    public Exercise() {
-    }
+    public Exercise() {}
 
-    public Exercise(String name, String description, String muscleGroup, String equipment, String source) {
+    public Exercise(String name, String description, String category, String equipment, String source) {
         this.name = name;
         this.description = description;
-        this.muscleGroup = muscleGroup;
-        this.equipment = equipment;
-        this.source = source;
+        this.category = category;
     }
 
+    // Getters and Setters
     public long getExerciseId() { return exerciseId; }
     public void setExerciseId(long exerciseId) { this.exerciseId = exerciseId; }
 
@@ -46,12 +43,9 @@ public class Exercise {
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
 
-    public String getMuscleGroup() { return muscleGroup; }
-    public void setMuscleGroup(String muscleGroup) { this.muscleGroup = muscleGroup; }
+    public String getCategory() { return category; }
+    public void setCategory(String muscleGroup) { this.category = muscleGroup; }
 
-    public String getEquipment() { return equipment; }
-    public void setEquipment(String equipment) { this.equipment = equipment; }
-
-    public String getSource() { return source; }
-    public void setSource(String source) { this.source = source; }
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 }

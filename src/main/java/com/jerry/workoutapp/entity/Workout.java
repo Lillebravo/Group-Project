@@ -10,7 +10,7 @@ import java.util.List;
 public class Workout {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "workout_id", columnDefinition = "INTEGER")
+    @Column(name = "id", columnDefinition = "INTEGER")
     private Long workoutId;
 
     @Column(name = "name", nullable = false)
@@ -27,26 +27,12 @@ public class Workout {
     @OrderBy("orderIndex ASC") // Sort in db directly
     private List<WorkoutExercise> workoutExercises = new ArrayList<>();
 
-    public Workout() {
-        this.createdAt = LocalDateTime.now();
-    }
+    public Workout() { this.createdAt = LocalDateTime.now(); }
 
     public Workout(String name, User user) {
         this.name = name;
         this.user = user;
         this.createdAt = LocalDateTime.now();
-    }
-
-    // Helper method to add exercise to workout
-    public void addExercise(Exercise exercise, Integer sets, Integer reps, Integer orderIndex) {
-        WorkoutExercise workoutExercise = new WorkoutExercise(this, exercise, sets, reps, orderIndex);
-        workoutExercises.add(workoutExercise);
-    }
-
-    // Helper method to remove exercise from workout
-    public void removeExercise(WorkoutExercise workoutExercise) {
-        workoutExercises.remove(workoutExercise);
-        workoutExercise.setWorkout(null);
     }
 
     // Getters and Setters

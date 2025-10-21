@@ -1,7 +1,8 @@
 package com.jerry.workoutapp.controller;
 
-import com.jerry.workoutapp.dto.UpdateWorkoutExerciseRequest;
+import com.jerry.workoutapp.dto.UpdateWorkoutExerciseSetRequest;
 import com.jerry.workoutapp.dto.WorkoutExerciseResponse;
+import com.jerry.workoutapp.dto.WorkoutExerciseSetResponse;
 import com.jerry.workoutapp.service.WorkoutExerciseService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,22 +20,37 @@ public class WorkoutExerciseController {
         this.workoutExerciseService = workoutExerciseService;
     }
 
-    // api/workoutExercises/{workoutId}/exercise/{exerciseId}
-    // Update sets and reps for a specific exercise in a workout
-    // Request body contains sets AND/OR reps
-    @PutMapping("/{workoutId}/exercise/{exerciseId}")
-    public ResponseEntity<WorkoutExerciseResponse> updateSetsAndReps(
-            @PathVariable Long workoutId,
-            @PathVariable Long exerciseId,
-            @RequestBody UpdateWorkoutExerciseRequest request
+    // UPPDATED: Now we update a specific SET instead of the whole exercise
+    // PUT /api/workoutExercises/{workoutExerciseId}/sets/{setNumber}
+    // Request body contains targetReps AND/OR targetWeight
+    @PutMapping("/{workoutExerciseId}/sets/{setNumber}")
+    public ResponseEntity<WorkoutExerciseSetResponse> updateSet(
+            @PathVariable Long workoutExerciseId,
+            @PathVariable Integer setNumber,
+            @RequestBody UpdateWorkoutExerciseSetRequest request
     ) {
-        WorkoutExerciseResponse response = workoutExerciseService.updateSetsAndReps(
-                workoutId,
-                exerciseId,
-                request.getSets(),
-                request.getReps()
+        WorkoutExerciseSetResponse response = workoutExerciseService.updateSet(
+                workoutExerciseId,
+                setNumber,
+                request.getTargetReps(),
+                request.getTargetWeight()
         );
 
+        return ResponseEntity.ok(response);
+    }
+
+    // NEW: Update rest_time for an exercise in a workout
+    // PUT /api/workoutExercises/{workoutExerciseId}/restTime
+    @PutMapping("/{workoutExerciseId}/restTime")
+    public ResponseEntity<WorkoutExerciseResponse> updateRestTime(
+            @PathVariable Long workoutExerciseId,
+            @RequestBody Map<String, Integer> request
+    ) {
+        Integer restTime = request.get("restTime");
+        WorkoutExerciseResponse response = workoutExerciseService.updateRestTime(
+                workoutExerciseId,
+                restTime
+        );
         return ResponseEntity.ok(response);
     }
 
