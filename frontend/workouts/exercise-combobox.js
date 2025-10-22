@@ -27,21 +27,21 @@ exerciseInput.addEventListener("input", async (e) => {
 	for (const exercise of exercises) {
 		const exerciseItem = document.createElement("div");
 		const exerciseItemText = document.createElement("span");
-		const exerciseItemMuscleGroup = document.createElement("span");
+		const exerciseItemCategory = document.createElement("span");
 
 		exerciseItemText.textContent = exercise.name;
-		exerciseItemMuscleGroup.textContent = exercise.muscleGroup;
-		exerciseItemMuscleGroup.classList.add("badge");
+		exerciseItemCategory.textContent = exercise.category;
+		exerciseItemCategory.classList.add("badge");
 
 		exerciseItem.appendChild(exerciseItemText);
-		exerciseItem.appendChild(exerciseItemMuscleGroup);
+		exerciseItem.appendChild(exerciseItemCategory);
 
 		exerciseItem.addEventListener("click", () => {
 			input.value = exercise.name;
 			currentName = exercise.name;
 
 			input.dataset.exerciseId = exercise.exerciseId;
-			input.dataset.muscleGroup = exercise.muscleGroup;
+			input.dataset.category = exercise.category;
 
 			autocompleteItems.innerHTML = "";
 			autocompleteItems.classList.add("hidden");

@@ -163,7 +163,7 @@ h3 {
 	flex-direction: column;
 }
 
-.exercise-muscle-group {
+.exercise-category {
 	font-size: 12px;
 	padding: 2px 8px;
 	color: var(--muted);

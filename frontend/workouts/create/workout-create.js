@@ -46,7 +46,7 @@ addExerciseModal.querySelector("#submit-exercise-modal").addEventListener("click
 	const newExercise = {
 		exerciseId: +exerciseInput.dataset.exerciseId,
 		exerciseName: exerciseInput.value,
-		muscleGroup: exerciseInput.dataset.muscleGroup,
+		category: exerciseInput.dataset.category,
 		sets: exerciseSets.valueAsNumber,
 		reps: exerciseReps.valueAsNumber,
 		orderIndex: exercises.length,
@@ -75,7 +75,7 @@ function makeExercise(exercise) {
 	exerciseElement.addEventListener("dragend", dragEnd);
 
 	exerciseElement.querySelector(".exercise-name").textContent = exercise.exerciseName;
-	exerciseElement.querySelector(".exercise-muscle-group").textContent = exercise.muscleGroup;
+	exerciseElement.querySelector(".exercise-category").textContent = exercise.category;
 	exerciseElement.querySelector(".exercise-index").textContent = exercise.orderIndex + 1;
 
 	exerciseElement.querySelector(".exercise-sets").textContent = exercise.sets;

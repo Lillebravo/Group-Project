@@ -92,7 +92,7 @@ function makeExercise(workout, exercise) {
 	exerciseElement.addEventListener("dragend", dragEnd);
 
 	exerciseElement.querySelector(".exercise-name").textContent = exercise.exerciseName;
-	exerciseElement.querySelector(".exercise-muscle-group").textContent = exercise.muscleGroup;
+	exerciseElement.querySelector(".exercise-category").textContent = exercise.category;
 	exerciseElement.querySelector(".exercise-index").textContent = exercise.orderIndex + 1;
 
 	exerciseElement.querySelector(".exercise-sets").textContent = exercise.sets;
