@@ -253,7 +253,7 @@ public class WorkoutService {
                 .sorted(Comparator.comparing(WorkoutExercise::getOrderIndex))
                 .map(we -> {
                     we.getSets().size();
-                    return convertToExerciseResponse(we);
+                    return WorkoutExerciseResponse.convert(we);
                 })
                 .collect(Collectors.toList());
 
@@ -264,19 +264,6 @@ public class WorkoutService {
                 workout.getCreatedAt(),
                 exerciseResponses.size(),
                 exerciseResponses
-        );
-    }
-
-    private WorkoutExerciseResponse convertToExerciseResponse(WorkoutExercise we) {
-        Exercise exercise = we.getExercise();
-        return new WorkoutExerciseResponse(
-                we.getWorkoutExerciseId(),
-                exercise.getExerciseId(),
-                exercise.getName(),
-                exercise.getCategory(),
-                we.getRestTime(),
-                we.getSets().size(),
-                we.getOrderIndex()
         );
     }
 }

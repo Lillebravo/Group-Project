@@ -1,5 +1,9 @@
 package com.jerry.workoutapp.dto;
 
+import com.jerry.workoutapp.entity.WorkoutExerciseSet;
+
+import java.util.List;
+
 public class WorkoutExerciseSetResponse {
     private Long id;
     private Long workoutExerciseId;
@@ -33,4 +37,14 @@ public class WorkoutExerciseSetResponse {
 
     public Double getTargetWeight() { return targetWeight; }
     public void setTargetWeight(Double targetWeight) { this.targetWeight = targetWeight; }
+
+    public static List<WorkoutExerciseSetResponse> convert(List<WorkoutExerciseSet> sets) {
+        return sets.stream().map((set) -> new WorkoutExerciseSetResponse(
+                set.getId(),
+                set.getWorkoutExercise().getWorkoutExerciseId(),
+                set.getSetNumber(),
+                set.getTargetReps(),
+                set.getTargetWeight()
+        )).toList();
+    }
 }
