@@ -106,7 +106,7 @@ public class WorkoutExerciseService {
 
         WorkoutExercise saved = workoutExerciseRepository.save(workoutExercise);
 
-        return convertToResponse(saved);
+        return WorkoutExerciseResponse.convert(saved);
     }
 
     //Delete exercise inside workouts by workoutExerciseId
@@ -143,19 +143,6 @@ public class WorkoutExerciseService {
         }
 
         workoutExerciseRepository.saveAll(remainingExercises);
-    }
-
-    // Helper method to convertert to DTO
-    private WorkoutExerciseResponse convertToResponse(WorkoutExercise we) {
-        return new WorkoutExerciseResponse(
-                we.getWorkoutExerciseId(),
-                we.getExercise().getExerciseId(),
-                we.getExercise().getName(),
-                we.getExercise().getCategory(),
-                we.getRestTime(),
-                we.getSets().size(), // number of sets
-                we.getOrderIndex()
-        );
     }
 
 }
