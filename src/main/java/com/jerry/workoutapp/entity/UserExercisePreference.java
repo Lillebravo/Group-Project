@@ -26,10 +26,10 @@ public class UserExercisePreference {
     private int isCustom = 0;
 
     @Column(name = "default_weight")
-    private double defaultWeight;
+    private Double defaultWeight;
 
     @Column(name = "default_rest_time", columnDefinition = "INTEGER")
-    private int defaultRestTime;
+    private Integer defaultRestTime;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;

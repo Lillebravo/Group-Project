@@ -23,4 +23,11 @@ public interface UserExercisePreferenceRepository extends JpaRepository<UserExer
 
     // Delete by user and exercise
     void deleteByUser_UserIdAndExercise_ExerciseId(Long userId, Long exerciseId);
+
+    // Check if an exercise is custom
+    boolean existsByExercise_ExerciseIdAndIsCustom(Long exerciseId, int isCustom);
+
+
+    // In UserExercisePreferenceRepository
+    List<UserExercisePreference> findByIsCustom(int isCustom);
 }
