@@ -41,9 +41,17 @@ public class ExerciseService {
                 .map(pref -> pref.getExercise().getExerciseId())
                 .collect(Collectors.toList());
 
-        // Filter: show default exercises (1-59) + user's custom exercises
+        // Get ALL custom exercise IDs (from any user) - ONE query
+        List<Long> allCustomExerciseIds = userExercisePreferenceRepository
+                .findByIsCustom(1)
+                .stream()
+                .map(pref -> pref.getExercise().getExerciseId())
+                .toList();
+
+        // Filter: show default exercises + user's custom exercises
         return allExercises.stream()
-                .filter(ex -> ex.getExerciseId() <= 59 || customExerciseIds.contains(ex.getExerciseId()))
+                .filter(ex -> !allCustomExerciseIds.contains(ex.getExerciseId())
+                        || customExerciseIds.contains(ex.getExerciseId()))
                 .map(ex -> new ExerciseResponse(
                         ex.getExerciseId(),
                         ex.getName(),
@@ -54,19 +62,24 @@ public class ExerciseService {
     }
 
     public List<ExerciseResponse> getAllExercises(Long userId) {
-        // Get all exercises
         List<Exercise> allExercises = exerciseRepository.findAll();
 
-        // Get user's custom exercise IDs
-        List<Long> customExerciseIds = userExercisePreferenceRepository
+        List<Long> userCustomIds = userExercisePreferenceRepository
                 .findByUser_UserIdAndIsCustom(userId, 1)
                 .stream()
                 .map(pref -> pref.getExercise().getExerciseId())
-                .collect(Collectors.toList());
+                .toList();
 
-        // Filter: show default exercises (1-59) + user's custom exercises only
+        // Get ALL custom exercise IDs (from any user) - ONE query
+        List<Long> allCustomExerciseIds = userExercisePreferenceRepository
+                .findByIsCustom(1)
+                .stream()
+                .map(pref -> pref.getExercise().getExerciseId())
+                .toList();
+
         return allExercises.stream()
-                .filter(ex -> ex.getExerciseId() <= 59 || customExerciseIds.contains(ex.getExerciseId()))
+                .filter(ex -> !allCustomExerciseIds.contains(ex.getExerciseId())
+                        || userCustomIds.contains(ex.getExerciseId()))
                 .map(ex -> new ExerciseResponse(
                         ex.getExerciseId(),
                         ex.getName(),
@@ -158,7 +171,7 @@ public class ExerciseService {
             throw new IllegalArgumentException("Du kan bara radera dina egna övningar");
         }
 
-        // Hard delete: Remove from both tables
+        //Remove from both tables
         userExercisePreferenceRepository.deleteByUser_UserIdAndExercise_ExerciseId(userId, exerciseId);
         exerciseRepository.deleteById(exerciseId);
     }
