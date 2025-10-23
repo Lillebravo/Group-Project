@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   //Hämta övningar från API
   async function fetchExercises() {
     try {
-      const res = await fetch("http://localhost:8080/api/exercises");
+      const res = await fetch("/api/exercises"); //ändra till http://localhost:8080/api/exercises för test
       if (!res.ok) throw new Error("Fel vid hämtning av övningar");
       const data = await res.json();
       allExercises = data;
@@ -32,7 +32,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const grouped = {};
 
     exercises.forEach((ex) => {
-      const group = ex.muscleGroup || ex.muscle_group || "Övrigt";
+      const group = ex.category || ex.muscleGroup || ex.muscle_group ||"Övrigt";
       if (!grouped[group]) grouped[group] = [];
       grouped[group].push(ex);
     });
@@ -77,28 +77,26 @@ document.addEventListener("DOMContentLoaded", async () => {
       });
   }
 
-// === Filtrering vid sökning ===
-searchInput.addEventListener("input", (e) => {
-  const keyword = e.target.value.toLowerCase();
-
-  const filtered = allExercises.filter((ex) => {
-    const nameMatch = ex.name.toLowerCase().includes(keyword);
-    const muscleMatch = (ex.muscleGroup || ex.muscle_group || "")
+  //Filtrering vid sökning (namn + muskelgrupp)
+  searchInput.addEventListener("input", (e) => {
+    const keyword = e.target.value.toLowerCase();
+    const filtered = allExercises.filter((ex) => {
+      const nameMatch = (ex.name || "").toLowerCase().includes(keyword);
+    const categoryMatch = (ex.category || ex.muscleGroup || ex.muscle_group || "")
       .toLowerCase()
       .includes(keyword);
-    return nameMatch || muscleMatch;
+
+    return nameMatch || categoryMatch;
   });
-
-  renderExercises(filtered);
-});
-
+    renderExercises(filtered);
+  });
 
   //Popup-funktion
   function openModal(ex) {
     modal.classList.remove("hidden");
     modalName.textContent = ex.name;
     modalDescription.textContent = ex.description || "Ingen beskrivning tillgänglig.";
-    modalMuscle.textContent = ex.muscleGroup || ex.muscle_group || "-";
+    modalMuscle.textContent = ex.category|| "-";
     modalEquipment.textContent = ex.equipment || "-";
     modalSource.textContent = ex.source || "-";
 
