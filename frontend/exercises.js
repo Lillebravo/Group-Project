@@ -77,14 +77,21 @@ document.addEventListener("DOMContentLoaded", async () => {
       });
   }
 
-  //Filtrering vid sökning
-  searchInput.addEventListener("input", (e) => {
-    const keyword = e.target.value.toLowerCase();
-    const filtered = allExercises.filter((ex) =>
-      ex.name.toLowerCase().includes(keyword)
-    );
-    renderExercises(filtered);
+// === Filtrering vid sökning ===
+searchInput.addEventListener("input", (e) => {
+  const keyword = e.target.value.toLowerCase();
+
+  const filtered = allExercises.filter((ex) => {
+    const nameMatch = ex.name.toLowerCase().includes(keyword);
+    const muscleMatch = (ex.muscleGroup || ex.muscle_group || "")
+      .toLowerCase()
+      .includes(keyword);
+    return nameMatch || muscleMatch;
   });
+
+  renderExercises(filtered);
+});
+
 
   //Popup-funktion
   function openModal(ex) {
