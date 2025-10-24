@@ -7,4 +7,5 @@
 	max-height: none;
 	background-color: transparent;
 	padding: 0;
+	overflow: initial;
 }
