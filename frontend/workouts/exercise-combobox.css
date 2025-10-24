@@ -1,3 +1,7 @@
+body:not(:has(.modal.hidden)) {
+	overflow: hidden;
+}
+
 .autocomplete {
 	/*the container must be positioned relative:*/
 	position: relative;
@@ -11,12 +15,13 @@
 	top: 52px;
 	left: 0;
 	right: 0;
+	max-height: 398px;
 
 	border: 1px solid var(--input-border);
 
 	background-color: var(--input);
 	border-radius: 12px;
-	overflow: hidden;
+	overflow: auto;
 }
 
 .autocomplete-items:empty {

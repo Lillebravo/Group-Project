@@ -47,39 +47,12 @@
 
 						<div class="exercise-wrapper">
 							<div class="exercise-header">
-								<span class="badge exercise-muscle-group">MUSCLE_GROUP</span>
+								<span class="badge exercise-category">EXERCISE_CATEGORY</span>
 								<h3 class="exercise-name">EXERCISE_NAME</h3>
-							</div>
-
-							<div class="exercise-data">
-								<p class="exercise-data-label">Sets</p>
-								<p class="exercise-data-value exercise-sets">EXERCISE_SETS</p>
-							</div>
-							<div class="exercise-data">
-								<p class="exercise-data-label">Reps</p>
-								<p class="exercise-data-value exercise-reps">EXERCISE_REPS</p>
 							</div>
 						</div>
 
 						<div class="exercise-actions">
-							<button class="btn small edit-exercise">
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									width="24"
-									height="24"
-									viewBox="0 0 24 24"
-									fill="none"
-									stroke="currentColor"
-									stroke-width="2"
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									class="pen"
-								>
-									<path
-										d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"
-									/>
-								</svg>
-							</button>
 							<button class="btn small delete-exercise">
 								<svg
 									xmlns="http://www.w3.org/2000/svg"
@@ -98,6 +71,45 @@
 									<path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
 								</svg>
 							</button>
+						</div>
+
+						<div class="exercise-sets">
+							<span class="exercise-sets-title">Sets:</span>
+						</div>
+					</div>
+				</template>
+
+				<template id="exercise-set-template">
+					<div class="exercise-set">
+						<span class="exercise-set-reps">SET_REPS</span>
+						<span>x</span>
+						<span class="exercise-set-weight">SET_WEIGHT</span>
+					</div>
+				</template>
+
+				<template id="exercise-sets-dropdown-template">
+					<div class="exercise-sets-dropdown hidden">
+						<div class="exercise-sets-dropdown-items"></div>
+						<button class="btn exercise-sets-dropdown-save-btn">Spara</button>
+					</div>
+				</template>
+
+				<template id="exercise-sets-dropdown-item-template">
+					<div class="exercise-sets-dropdown-item">
+						<span class="exercise-set-name">SET_NAME</span>
+						<div class="exercise-sets-dropdown-item-inputs">
+							<div class="exercise-sets-dropdown-item-reps">
+								<span class="exercise-sets-dropdown-item-label">Reps</span>
+								<input type="number" class="input exercise-sets-dropdown-item-value" name="reps" />
+							</div>
+							<div class="exercise-sets-dropdown-item-weight">
+								<span class="exercise-sets-dropdown-item-label">Weight (kg)</span>
+								<input
+									type="number"
+									class="input exercise-sets-dropdown-item-value"
+									name="weight"
+								/>
+							</div>
 						</div>
 					</div>
 				</template>
@@ -126,6 +138,7 @@
 					<div class="row between" style="margin-top: 16px">
 						<input type="number" id="exercise-sets" class="input" placeholder="Sets" />
 						<input type="number" id="exercise-reps" class="input" placeholder="Reps" />
+						<input type="number" id="exercise-weight" class="input" placeholder="Weight (kg)" />
 					</div>
 
 					<div class="row between" style="margin-top: 16px">

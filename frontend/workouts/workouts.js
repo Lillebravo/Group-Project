@@ -4,8 +4,15 @@ import { emptyImg, isElementBefore } from "../utils.js";
 const html = String.raw;
 
 const mainElement = document.querySelector("main");
+
 const workoutTemplate = document.querySelector("#workout-template");
 const exerciseTemplate = document.querySelector("#workout-exercise-template");
+const exerciseSetTemplate = document.querySelector("#exercise-set-template");
+const exerciseSetsDropdownTemplate = document.querySelector("#exercise-sets-dropdown-template");
+const exerciseSetsDropdownItemTemplate = document.querySelector(
+	"#exercise-sets-dropdown-item-template"
+);
+
 const addExerciseModal = document.querySelector("#add-exercise-modal");
 const workoutsList = document.querySelector("#workouts-list");
 
@@ -92,21 +99,129 @@ function makeExercise(workout, exercise) {
 	exerciseElement.addEventListener("dragend", dragEnd);
 
 	exerciseElement.querySelector(".exercise-name").textContent = exercise.exerciseName;
-	exerciseElement.querySelector(".exercise-muscle-group").textContent = exercise.muscleGroup;
+	exerciseElement.querySelector(".exercise-category").textContent = exercise.category;
 	exerciseElement.querySelector(".exercise-index").textContent = exercise.orderIndex + 1;
 
-	exerciseElement.querySelector(".exercise-sets").textContent = exercise.sets;
-	exerciseElement.querySelector(".exercise-reps").textContent = exercise.reps;
+	const exerciseSets = exerciseElement.querySelector(".exercise-sets");
+	for (const set of exercise.sets) {
+		const exerciseSetElement = makeExerciseSet(set);
+		exerciseSets.appendChild(exerciseSetElement);
+	}
+
+	if (exercise.sets.length > 0) {
+		const dropdownButton = document.createElement("button");
+		dropdownButton.classList.add("exercise-sets-dropdown-btn");
+
+		dropdownButton.insertAdjacentHTML(
+			"afterbegin",
+			`<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down-icon lucide-chevron-down"><path d="m6 9 6 6 6-6"/></svg>`
+		);
+
+		exerciseSets.appendChild(dropdownButton);
+	}
+
+	const exerciseSetsDropdown = makeExerciseSetsDropdown(exercise.sets, exerciseSets);
+	exerciseSets.appendChild(exerciseSetsDropdown);
 
 	exerciseElement.querySelector(".delete-exercise").addEventListener("click", () => {
 		deleteExercise(exercise, workout, exerciseElement);
 	});
 
-	exerciseElement.querySelector(".edit-exercise").addEventListener("click", () => {
-		editExercise(exercise, workout, exerciseElement);
+	return exerciseElement;
+}
+
+function makeExerciseSet(set) {
+	const exerciseSetElement = exerciseSetTemplate.content
+		.cloneNode(true)
+		.querySelector(".exercise-set");
+
+	exerciseSetElement.dataset.setNumber = set.setNumber;
+
+	exerciseSetElement.querySelector(".exercise-set-reps").textContent = set.targetReps;
+	exerciseSetElement.querySelector(".exercise-set-weight").textContent = `${set.targetWeight} kg`;
+
+	return exerciseSetElement;
+}
+
+function makeExerciseSetsDropdown(sets, exerciseSets) {
+	const exerciseSetsDropdown = exerciseSetsDropdownTemplate.content
+		.cloneNode(true)
+		.querySelector(".exercise-sets-dropdown");
+
+	const dropdownItems = exerciseSetsDropdown.querySelector(".exercise-sets-dropdown-items");
+
+	for (const set of sets) {
+		const item = exerciseSetsDropdownItemTemplate.content
+			.cloneNode(true)
+			.querySelector(".exercise-sets-dropdown-item");
+
+		item.querySelector(".exercise-set-name").textContent = `Set ${set.setNumber}`;
+		item.querySelector(
+			".exercise-sets-dropdown-item-reps .exercise-sets-dropdown-item-value"
+		).value = set.targetReps;
+		item.querySelector(
+			".exercise-sets-dropdown-item-weight .exercise-sets-dropdown-item-value"
+		).value = set.targetWeight;
+
+		dropdownItems.appendChild(item);
+	}
+
+	exerciseSetsDropdown
+		.querySelector(".exercise-sets-dropdown-save-btn")
+		.addEventListener("click", async () => {
+			const dropdownNodes = exerciseSetsDropdown.querySelectorAll(".exercise-sets-dropdown-item");
+
+			const changedSets = [];
+
+			for (const [index, item] of dropdownNodes.entries()) {
+				const reps = item.querySelector(
+					".exercise-sets-dropdown-item-reps .exercise-sets-dropdown-item-value"
+				);
+				const weight = item.querySelector(
+					".exercise-sets-dropdown-item-weight .exercise-sets-dropdown-item-value"
+				);
+
+				const setNumber = index + 1;
+
+				const set = sets.find((set) => set.setNumber == setNumber);
+
+				if (set.targetReps != reps.value || set.targetWeight != weight.value) {
+					changedSets.push({
+						setNumber,
+						workoutExerciseId: set.workoutExerciseId,
+						targetReps: reps.valueAsNumber,
+						targetWeight: weight.valueAsNumber,
+					});
+				}
+			}
+
+			if (changedSets.length == 0) {
+				exerciseSetsDropdown.classList.toggle("hidden");
+				return;
+			}
+
+			for (const set of changedSets) {
+				await putRequest(`/workoutExercises/${set.workoutExerciseId}/sets/${set.setNumber}`, {
+					targetReps: set.targetReps,
+					targetWeight: set.targetWeight,
+				});
+
+				exerciseSetsDropdown.classList.toggle("hidden");
+
+				const item = exerciseSets.querySelector(
+					`.exercise-set[data-set-number="${set.setNumber}"]`
+				);
+
+				item.querySelector(".exercise-set-reps").textContent = set.targetReps;
+				item.querySelector(".exercise-set-weight").textContent = `${set.targetWeight} kg`;
+			}
+		});
+
+	exerciseSets.querySelector(".exercise-sets-dropdown-btn").addEventListener("click", () => {
+		exerciseSetsDropdown.classList.toggle("hidden");
 	});
 
-	return exerciseElement;
+	return exerciseSetsDropdown;
 }
 
 async function deleteWorkout(workout) {
@@ -270,12 +385,14 @@ addExerciseModal.querySelector("#submit-exercise-modal").addEventListener("click
 	const exerciseInput = addExerciseModal.querySelector("#exercise-input");
 	const exerciseSets = addExerciseModal.querySelector("#exercise-sets");
 	const exerciseReps = addExerciseModal.querySelector("#exercise-reps");
+	const exerciseWeight = addExerciseModal.querySelector("#exercise-weight");
 
 	if (
 		!exerciseInput.value ||
 		!exerciseInput.dataset.exerciseId ||
 		!exerciseSets.value ||
-		!exerciseReps.value
+		!exerciseReps.value ||
+		!exerciseWeight.value
 	) {
 		alert("Fyll i alla fält");
 		return;
@@ -283,10 +400,17 @@ addExerciseModal.querySelector("#submit-exercise-modal").addEventListener("click
 
 	const workoutId = addExerciseModal.dataset.workoutId;
 
+	const sets = Array.from({ length: exerciseSets.valueAsNumber }).map((_, i) => ({
+		setNumber: i + 1,
+		targetReps: exerciseReps.valueAsNumber,
+		targetWeight: exerciseWeight.valueAsNumber,
+	}));
+
+	console.log(sets);
+
 	const response = await postRequest(`/workouts/${workoutId}/exercises`, {
 		exerciseId: +exerciseInput.dataset.exerciseId,
-		sets: exerciseSets.valueAsNumber,
-		reps: exerciseReps.valueAsNumber,
+		sets,
 	});
 
 	if (response.message || response.error) {
@@ -307,6 +431,7 @@ addExerciseModal.querySelector("#submit-exercise-modal").addEventListener("click
 	addExerciseModal.querySelector("#exercise-input").value = "";
 	addExerciseModal.querySelector("#exercise-sets").value = "";
 	addExerciseModal.querySelector("#exercise-reps").value = "";
+	addExerciseModal.querySelector("#exercise-weight").value = "";
 
 	document.querySelector(
 		`.workout-wrapper[data-id="${workoutId}"] .exercise-count`
