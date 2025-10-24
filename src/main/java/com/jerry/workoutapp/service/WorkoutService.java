@@ -2,6 +2,7 @@ package com.jerry.workoutapp.service;
 
 import com.jerry.workoutapp.dto.SetRequest;
 import com.jerry.workoutapp.dto.WorkoutExerciseResponse;
+import com.jerry.workoutapp.dto.WorkoutExerciseSetResponse;
 import com.jerry.workoutapp.dto.WorkoutResponse;
 import com.jerry.workoutapp.entity.*;
 import com.jerry.workoutapp.repository.*;
@@ -11,6 +12,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -81,6 +83,10 @@ public class WorkoutService {
         List<WorkoutExercise> existingExercises = workoutExerciseRepository
                 .findByWorkout_WorkoutIdOrderByOrderIndexAsc(workoutId);
 
+        // Save results so we can gather and rebuild a response with new edits
+        List<WorkoutExercise> savedExistingExercises = new ArrayList<>();
+        List<WorkoutExerciseSet> savedSets = new ArrayList<>();
+
         // Handle orderIndex logic (BEFORE we create WorkoutExercise)
         if (orderIndex == null) {
             // If orderIndex isn´t set, set it to the next position
@@ -100,8 +106,10 @@ public class WorkoutService {
                     we.setOrderIndex(we.getOrderIndex() + 1);
                 }
             }
-            workoutExerciseRepository.saveAll(existingExercises);
+            List<WorkoutExercise> savedExercises = workoutExerciseRepository.saveAll(existingExercises);
             workoutExerciseRepository.flush();
+
+            savedExistingExercises.addAll(savedExercises);
         }
 
         // Create WorkoutExercise (WITHOUT sets/reps)
@@ -126,15 +134,29 @@ public class WorkoutService {
                         setReq.getTargetReps(),
                         setReq.getTargetWeight()
                 );
-                workoutExerciseSetRepository.save(set);
+                WorkoutExerciseSet savedSet = workoutExerciseSetRepository.save(set);
+                savedSets.add(savedSet);
             }
         }
 
-        // Reload workout with all relations
-        Workout savedWorkout = workoutRepository.findById(workoutId)
-                .orElseThrow(() -> new RuntimeException("Workout not found"));
+        // Rebuild saved stuff to a WorkoutResponse
 
-        return convertToResponse(savedWorkout);
+        WorkoutExerciseResponse exerciseResponse = WorkoutExerciseResponse.convert(workoutExercise);
+        exerciseResponse.setSets(WorkoutExerciseSetResponse.convert(savedSets));
+        exerciseResponse.setOrderIndex(orderIndex);
+
+        List<WorkoutExerciseResponse> allExerciseResponses = savedExistingExercises
+                .stream()
+                .map(WorkoutExerciseResponse::convert)
+                .collect(Collectors.toList());
+
+        allExerciseResponses.add(exerciseResponse);
+
+        return new WorkoutResponse(
+                workoutId, workout.getName(),
+                user.getUserId(), workout.getCreatedAt(),
+                allExerciseResponses.size(), allExerciseResponses
+        );
     }
 
     public List<WorkoutResponse> getUserWorkouts() {
