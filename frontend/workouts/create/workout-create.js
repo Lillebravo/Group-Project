@@ -1,5 +1,5 @@
 import { getJwtTokenInfo, postRequest } from "../../api.js";
-import { emptyImg, isElementBefore } from "../../utils.js";
+import { emptyImg, isElementBefore, secondsToMinutesAndSeconds } from "../../utils.js";
 
 const html = String.raw;
 
@@ -39,6 +39,9 @@ addExerciseModal.querySelector("#submit-exercise-modal").addEventListener("click
 	const exerciseSets = addExerciseModal.querySelector("#exercise-sets");
 	const exerciseReps = addExerciseModal.querySelector("#exercise-reps");
 	const exerciseWeight = addExerciseModal.querySelector("#exercise-weight");
+	const exerciseRestTime = addExerciseModal.querySelector("#exercise-rest-time");
+
+	const restTime = exerciseRestTime.valueAsNumber;
 
 	if (
 		!exerciseInput.value ||
@@ -61,6 +64,7 @@ addExerciseModal.querySelector("#submit-exercise-modal").addEventListener("click
 		exerciseId: +exerciseInput.dataset.exerciseId,
 		exerciseName: exerciseInput.value,
 		category: exerciseInput.dataset.category,
+		restTime: isNaN(restTime) ? 0 : restTime,
 		sets,
 		orderIndex: exercises.length,
 	};
@@ -76,6 +80,7 @@ addExerciseModal.querySelector("#submit-exercise-modal").addEventListener("click
 	addExerciseModal.querySelector("#exercise-sets").value = "";
 	addExerciseModal.querySelector("#exercise-reps").value = "";
 	addExerciseModal.querySelector("#exercise-weight").value = "";
+	addExerciseModal.querySelector("#exercise-rest-time").value = "";
 });
 
 function makeExercise(exercise) {
@@ -91,6 +96,13 @@ function makeExercise(exercise) {
 	exerciseElement.querySelector(".exercise-name").textContent = exercise.exerciseName;
 	exerciseElement.querySelector(".exercise-category").textContent = exercise.category;
 	exerciseElement.querySelector(".exercise-index").textContent = exercise.orderIndex + 1;
+
+	const restTimeValue = exerciseElement.querySelector(".exercise-rest-time-value");
+	restTimeValue.textContent = secondsToMinutesAndSeconds(exercise.restTime);
+
+	exerciseElement.querySelector(".exercise-rest-time-edit").addEventListener("click", () => {
+		editRestTime(exercise, exerciseElement);
+	});
 
 	const exerciseSets = exerciseElement.querySelector(".exercise-sets");
 	for (const set of exercise.sets) {
@@ -203,6 +215,64 @@ addExerciseModal.querySelector("#close-exercise-modal").addEventListener("click"
 	addExerciseModal.classList.add("hidden");
 });
 
+async function editRestTime(exercise, exerciseElement) {
+	const element = exerciseElement.querySelector(".exercise-rest-time-value");
+	const button = exerciseElement.querySelector(".exercise-rest-time-edit");
+
+	const oldElement = exerciseElement.querySelector(".exercise-rest-time-value").cloneNode(true);
+	const oldButton = exerciseElement.querySelector(".exercise-rest-time-edit").cloneNode(true);
+	const oldValue = exercise.restTime;
+
+	const newElement = document.createElement("input");
+	newElement.type = "number";
+	newElement.value = exercise.restTime;
+	newElement.classList.add("input", "exercise-rest-time-value");
+
+	const newButton = document.createElement("button");
+	newButton.classList.add("exercise-rest-time-edit", "confirm");
+	newButton.insertAdjacentHTML(
+		"afterbegin",
+		`<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check-icon lucide-check"><path d="M20 6 9 17l-5-5"/></svg>`
+	);
+
+	element.replaceWith(newElement);
+	button.replaceWith(newButton);
+
+	const revert = (restTime) => {
+		newElement.replaceWith(oldElement);
+		newButton.replaceWith(oldButton);
+
+		oldElement.textContent = secondsToMinutesAndSeconds(restTime);
+
+		oldButton.addEventListener("click", () => {
+			editRestTime(exercise, exerciseElement);
+		});
+	};
+
+	newButton.addEventListener("click", async () => {
+		const restTime = newElement.valueAsNumber;
+
+		if (isNaN(restTime)) {
+			alert("Fyll i vilotid");
+			return;
+		}
+
+		if (restTime < 0) {
+			alert("Vilotid kan inte vara negativ");
+			return;
+		}
+
+		if (restTime == oldValue) {
+			revert(oldValue);
+			return;
+		}
+
+		exercise.restTime = restTime;
+
+		revert(restTime);
+	});
+}
+
 async function deleteExercise(exercise, exerciseElement) {
 	const confirmation = confirm(
 		`Är du säker på att du vill ta bort ${exercise.exerciseName} från schemat?`
@@ -241,6 +311,7 @@ document.querySelector("#submit-workout-form").addEventListener("click", async (
 		.map((exercise) => ({
 			exerciseId: exercise.exerciseId,
 			sets: exercise.sets,
+			restTime: exercise.restTime,
 		}));
 
 	for (const exercise of exercisesToAdd) {
