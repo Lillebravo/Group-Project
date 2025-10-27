@@ -137,6 +137,7 @@ h3 {
 	grid-template-columns: min-content 1fr min-content;
 	grid-template-areas:
 		"exercise-index exercise-wrapper exercise-actions"
+		"exercise-index exercise-rest-time exercise-actions"
 		"exercise-index exercise-sets exercise-actions";
 	width: 100%;
 	align-items: center;
@@ -261,6 +262,49 @@ h3 {
 	gap: 16px;
 }
 
+.exercise-rest-time {
+	grid-area: exercise-rest-time;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.exercise-rest-time-title {
+	color: var(--muted);
+}
+
+.exercise-rest-time-edit {
+	width: 16px;
+	height: 16px;
+	border: none;
+	padding: 0;
+	background: transparent;
+	cursor: pointer;
+}
+
+.exercise-rest-time-edit svg {
+	color: var(--muted);
+	width: 16px;
+	height: 16px;
+}
+
+.exercise-rest-time-edit:hover svg {
+	color: var(--accent);
+}
+
+.exercise-rest-time-value.input {
+	width: 100px;
+	padding: 8px;
+}
+
+.exercise-rest-time-edit.confirm {
+	width: 28px;
+	height: 28px;
+	padding: 6px;
+	border-radius: 8px;
+	background-color: rgba(255, 255, 255, 0.05);
+}
+
 .exercise-sets {
 	position: relative;
 	grid-area: exercise-sets;
@@ -368,4 +412,10 @@ h3 {
 .exercise-sets-dropdown-item-value {
 	width: 100px;
 	padding: 8px 8px;
+}
+
+.add-exercise-inputs {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 16px;
 }

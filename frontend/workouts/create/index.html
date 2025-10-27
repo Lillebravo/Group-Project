@@ -70,6 +70,29 @@
 							</button>
 						</div>
 
+						<div class="exercise-rest-time">
+							<span class="exercise-rest-time-title">Vilotid:</span>
+							<span class="exercise-rest-time-value">REST_TIME</span>
+							<button class="exercise-rest-time-edit">
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									width="24"
+									height="24"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									class="lucide lucide-pen-icon lucide-pen"
+								>
+									<path
+										d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"
+									/>
+								</svg>
+							</button>
+						</div>
+
 						<div class="exercise-sets">
 							<span class="exercise-sets-title">Sets:</span>
 						</div>
@@ -137,10 +160,16 @@
 					<input id="exercise-input" class="input" type="text" placeholder="Sök övning" />
 					<div id="exercise-autocomplete-items" class="autocomplete-items hidden"></div>
 
-					<div class="row between" style="margin-top: 16px">
+					<div class="add-exercise-inputs" style="margin-top: 16px">
 						<input type="number" id="exercise-sets" class="input" placeholder="Sets" />
 						<input type="number" id="exercise-reps" class="input" placeholder="Reps" />
 						<input type="number" id="exercise-weight" class="input" placeholder="Weight (kg)" />
+						<input
+							type="number"
+							id="exercise-rest-time"
+							class="input"
+							placeholder="Rest time (s)"
+						/>
 					</div>
 
 					<div class="row between" style="margin-top: 16px">
