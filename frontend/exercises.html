@@ -1,69 +1,88 @@
 <!DOCTYPE html>
 <html lang="sv">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Övningar — GymSite</title>
-    <link rel="stylesheet" href="global.css" />
-    <link rel="stylesheet" href="exercises.css" />
-  </head>
-  <body>
-    <!-- Navbar -->
-    <header class="navbar">
-      <nav class="container">
-        <a href="/" class="logo">GymSite</a>
-        <div class="nav-items">
-          <a href="/" class="link">Hem</a>
-          <a href="exercises.html" class="link strong">Övningar</a>
-          <a href="/workouts" class="link">Scheman</a>
-          <a href="/blog" class="link">Blogg</a>
-          <a href="/login" class="btn small link" id="signInBtn">Bli medlem</a>
-        </div>
-      </nav>
-    </header>
 
-    <main class="container exercises-page">
-      <h1 class="page-title">Utforska Övningar</h1>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Övningar — GymSite</title>
+  <link rel="stylesheet" href="global.css" />
+  <link rel="stylesheet" href="exercises.css" />
+</head>
 
-      <!-- Sökfält -->
-      <div class="search-section">
-        <input
-          id="searchInput"
-          class="input search-input"
-          type="text"
-          placeholder="Sök efter en övning..."
-        />
+<body>
+  <!-- Navbar -->
+  <header class="navbar">
+    <nav class="container">
+      <a href="/" class="logo">GymSite</a>
+      <div class="nav-items">
+        <a href="/" class="link">Hem</a>
+        <a href="exercises.html" class="link strong">Övningar</a>
+        <a href="/workouts" class="link">Scheman</a>
+        <a href="/blog" class="link">Blogg</a>
+        <a href="/login" class="btn small link" id="signInBtn">Bli medlem</a>
       </div>
+    </nav>
+  </header>
 
-      <!-- Lista över muskelgrupper -->
-      <section id="exerciseList" class="exercise-list">
-        <p class="loading-text">Laddar övningar...</p>
-      </section>
-    </main>
+  <main class="container exercises-page">
+    <h1 class="page-title">Utforska Övningar</h1>
 
-    <footer class="page-footer">
-      <div class="container">
-        <small>© GymSite</small>
-      </div>
-    </footer>
+    <!-- Sökfält -->
+    <div class="search-section">
+      <input id="searchInput" class="input search-input" type="text" placeholder="Sök efter en övning..." />
+    </div>
+    <button id="createExerciseBtn" class="btn primary">Skapa egen övning</button>
 
-    <!-- Popup för övningsinfo -->
-    <div id="exerciseModal" class="modal hidden">
+    <!-- Skapa egen övning -->
+    <div id="createExerciseModal" class="modal hidden">
       <div class="modal-content">
-        <h2 id="modalName"></h2>
-        <p id="modalDescription"></p>
-        <p><strong>Muskelgrupp:</strong> <span id="modalMuscle"></span></p>
-        <p><strong>Utrustning:</strong> <span id="modalEquipment"></span></p>
-        <p><strong>Källa:</strong> <span id="modalSource"></span></p>
+        <span id="closeCreateModal" class="close">&times;</span>
+        <h2>Skapa egen övning</h2>
 
-        <div class="row between" style="margin-top:16px;">
-          <button id="closeModal" class="btn">Stäng</button>
-          <button id="addToPlan" class="btn primary">Lägg till i schema</button>
-        </div>
+        <label for="customName">Namn</label>
+        <input type="text" id="customName" placeholder="Övningsnamn" />
+
+        <label for="customCategory">Muskelgrupp</label>
+        <input type="text" id="customCategory" placeholder="Ex: Ben, Bröst" />
+
+        <label for="customDescription">Beskrivning</label>
+        <textarea id="customDescription" placeholder="Kort beskrivning..."></textarea>
+
+        <button id="saveCustomExercise" class="btn success">Spara övning</button>
       </div>
     </div>
 
-	<script src="nav.js" type="module"></script>
-    <script src="exercises.js"></script>
-  </body>
+
+    <!-- Lista över muskelgrupper -->
+    <section id="exerciseList" class="exercise-list">
+      <p class="loading-text">Laddar övningar...</p>
+    </section>
+  </main>
+
+  <footer class="page-footer">
+    <div class="container">
+      <small>© GymSite</small>
+    </div>
+  </footer>
+
+  <!-- Popup för övningsinfo -->
+  <div id="exerciseModal" class="modal hidden">
+    <div class="modal-content">
+      <h2 id="modalName"></h2>
+      <p id="modalDescription"></p>
+      <p><strong>Muskelgrupp:</strong> <span id="modalMuscle"></span></p>
+      <p><strong>Utrustning:</strong> <span id="modalEquipment"></span></p>
+      <p><strong>Källa:</strong> <span id="modalSource"></span></p>
+
+      <div class="row between" style="margin-top:16px;">
+        <button id="closeModal" class="btn">Stäng</button>
+        <button id="addToPlan" class="btn primary">Lägg till i schema</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="nav.js" type="module"></script>
+  <script src="exercises.js"></script>
+</body>
+
 </html>
