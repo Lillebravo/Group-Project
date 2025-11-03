@@ -5,7 +5,7 @@ import java.util.List;
 public class AddExerciseRequest {
     private Long exerciseId;
     private int restTime;
-    private int orderIndex;
+    private Integer orderIndex; // Wrapper class so it's nullable since its optional
     private List<SetRequest> sets;
 
     public AddExerciseRequest() {}

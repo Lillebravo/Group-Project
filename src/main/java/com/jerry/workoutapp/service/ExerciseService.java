@@ -56,7 +56,8 @@ public class ExerciseService {
                         ex.getExerciseId(),
                         ex.getName(),
                         ex.getDescription(),
-                        ex.getCategory()
+                        ex.getCategory(),
+                        customExerciseIds.contains(ex.getExerciseId())
                 ))
                 .collect(Collectors.toList());
     }
@@ -84,7 +85,8 @@ public class ExerciseService {
                         ex.getExerciseId(),
                         ex.getName(),
                         ex.getDescription(),
-                        ex.getCategory()
+                        ex.getCategory(),
+                        userCustomIds.contains(ex.getExerciseId())
                 ))
                 .collect(Collectors.toList());
     }
@@ -124,7 +126,8 @@ public class ExerciseService {
                 savedExercise.getExerciseId(),
                 savedExercise.getName(),
                 savedExercise.getDescription(),
-                savedExercise.getCategory()
+                savedExercise.getCategory(),
+                true
         );
     }
 
@@ -160,7 +163,8 @@ public class ExerciseService {
                 updatedExercise.getExerciseId(),
                 updatedExercise.getName(),
                 updatedExercise.getDescription(),
-                updatedExercise.getCategory()
+                updatedExercise.getCategory(),
+                true
         );
     }
 

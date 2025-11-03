@@ -1,11 +1,17 @@
 import { getJwtTokenInfo, postRequest } from "../../api.js";
-import { emptyImg, isElementBefore } from "../../utils.js";
+import { emptyImg, isElementBefore, secondsToMinutesAndSeconds } from "../../utils.js";
 
 const html = String.raw;
 
 const exercisesList = document.querySelector(".workout-exercises");
+
 const addExerciseModal = document.querySelector("#add-exercise-modal");
 const exerciseTemplate = document.querySelector("#workout-exercise-template");
+const exerciseSetTemplate = document.querySelector("#exercise-set-template");
+const exerciseSetsDropdownTemplate = document.querySelector("#exercise-sets-dropdown-template");
+const exerciseSetsDropdownItemTemplate = document.querySelector(
+	"#exercise-sets-dropdown-item-template"
+);
 
 const exercises = [];
 
@@ -32,23 +38,34 @@ addExerciseModal.querySelector("#submit-exercise-modal").addEventListener("click
 	const exerciseInput = addExerciseModal.querySelector("#exercise-input");
 	const exerciseSets = addExerciseModal.querySelector("#exercise-sets");
 	const exerciseReps = addExerciseModal.querySelector("#exercise-reps");
+	const exerciseWeight = addExerciseModal.querySelector("#exercise-weight");
+	const exerciseRestTime = addExerciseModal.querySelector("#exercise-rest-time");
+
+	const restTime = exerciseRestTime.valueAsNumber;
 
 	if (
 		!exerciseInput.value ||
 		!exerciseInput.dataset.exerciseId ||
 		!exerciseSets.value ||
-		!exerciseReps.value
+		!exerciseReps.value ||
+		!exerciseWeight.value
 	) {
 		alert("Fyll i alla fält");
 		return;
 	}
 
+	const sets = Array.from({ length: exerciseSets.valueAsNumber }).map((_, i) => ({
+		setNumber: i + 1,
+		targetReps: exerciseReps.valueAsNumber,
+		targetWeight: exerciseWeight.valueAsNumber,
+	}));
+
 	const newExercise = {
 		exerciseId: +exerciseInput.dataset.exerciseId,
 		exerciseName: exerciseInput.value,
-		muscleGroup: exerciseInput.dataset.muscleGroup,
-		sets: exerciseSets.valueAsNumber,
-		reps: exerciseReps.valueAsNumber,
+		category: exerciseInput.dataset.category,
+		restTime: isNaN(restTime) ? 0 : restTime,
+		sets,
 		orderIndex: exercises.length,
 	};
 
@@ -62,6 +79,8 @@ addExerciseModal.querySelector("#submit-exercise-modal").addEventListener("click
 	addExerciseModal.querySelector("#exercise-input").value = "";
 	addExerciseModal.querySelector("#exercise-sets").value = "";
 	addExerciseModal.querySelector("#exercise-reps").value = "";
+	addExerciseModal.querySelector("#exercise-weight").value = "";
+	addExerciseModal.querySelector("#exercise-rest-time").value = "";
 });
 
 function makeExercise(exercise) {
@@ -75,29 +94,184 @@ function makeExercise(exercise) {
 	exerciseElement.addEventListener("dragend", dragEnd);
 
 	exerciseElement.querySelector(".exercise-name").textContent = exercise.exerciseName;
-	exerciseElement.querySelector(".exercise-muscle-group").textContent = exercise.muscleGroup;
+	exerciseElement.querySelector(".exercise-category").textContent = exercise.category;
 	exerciseElement.querySelector(".exercise-index").textContent = exercise.orderIndex + 1;
 
-	exerciseElement.querySelector(".exercise-sets").textContent = exercise.sets;
-	exerciseElement.querySelector(".exercise-reps").textContent = exercise.reps;
+	const restTimeValue = exerciseElement.querySelector(".exercise-rest-time-value");
+	restTimeValue.textContent = secondsToMinutesAndSeconds(exercise.restTime);
+
+	exerciseElement.querySelector(".exercise-rest-time-edit").addEventListener("click", () => {
+		editRestTime(exercise, exerciseElement);
+	});
+
+	const exerciseSets = exerciseElement.querySelector(".exercise-sets");
+	for (const set of exercise.sets) {
+		const exerciseSetElement = makeExerciseSet(set);
+		exerciseSets.appendChild(exerciseSetElement);
+	}
+
+	if (exercise.sets.length > 0) {
+		const dropdownButton = document.createElement("button");
+		dropdownButton.classList.add("exercise-sets-dropdown-btn");
+
+		dropdownButton.insertAdjacentHTML(
+			"afterbegin",
+			`<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down-icon lucide-chevron-down"><path d="m6 9 6 6 6-6"/></svg>`
+		);
+
+		exerciseSets.appendChild(dropdownButton);
+	}
+
+	const exerciseSetsDropdown = makeExerciseSetsDropdown(exercise.sets, exerciseSets);
+	exerciseSets.appendChild(exerciseSetsDropdown);
 
 	exerciseElement.querySelector(".delete-exercise").addEventListener("click", () => {
 		e.preventDefault();
 		deleteExercise(exercise, exerciseElement);
 	});
 
-	exerciseElement.querySelector(".edit-exercise").addEventListener("click", (e) => {
+	return exerciseElement;
+}
+
+function makeExerciseSet(set) {
+	const exerciseSetElement = exerciseSetTemplate.content
+		.cloneNode(true)
+		.querySelector(".exercise-set");
+
+	exerciseSetElement.dataset.setNumber = set.setNumber;
+
+	exerciseSetElement.querySelector(".exercise-set-reps").textContent = set.targetReps;
+	exerciseSetElement.querySelector(".exercise-set-weight").textContent = `${set.targetWeight} kg`;
+
+	return exerciseSetElement;
+}
+
+function makeExerciseSetsDropdown(sets, exerciseSets) {
+	const exerciseSetsDropdown = exerciseSetsDropdownTemplate.content
+		.cloneNode(true)
+		.querySelector(".exercise-sets-dropdown");
+
+	const dropdownItems = exerciseSetsDropdown.querySelector(".exercise-sets-dropdown-items");
+
+	for (const set of sets) {
+		const item = exerciseSetsDropdownItemTemplate.content
+			.cloneNode(true)
+			.querySelector(".exercise-sets-dropdown-item");
+
+		item.querySelector(".exercise-set-name").textContent = `Set ${set.setNumber}`;
+		item.querySelector(
+			".exercise-sets-dropdown-item-reps .exercise-sets-dropdown-item-value"
+		).value = set.targetReps;
+		item.querySelector(
+			".exercise-sets-dropdown-item-weight .exercise-sets-dropdown-item-value"
+		).value = set.targetWeight;
+
+		dropdownItems.appendChild(item);
+	}
+
+	exerciseSetsDropdown
+		.querySelector(".exercise-sets-dropdown-save-btn")
+		.addEventListener("click", async (e) => {
+			e.preventDefault();
+
+			const dropdownNodes = exerciseSetsDropdown.querySelectorAll(".exercise-sets-dropdown-item");
+
+			for (const [index, item] of dropdownNodes.entries()) {
+				const reps = item.querySelector(
+					".exercise-sets-dropdown-item-reps .exercise-sets-dropdown-item-value"
+				);
+				const weight = item.querySelector(
+					".exercise-sets-dropdown-item-weight .exercise-sets-dropdown-item-value"
+				);
+
+				sets[index] = {
+					targetReps: reps.valueAsNumber,
+					targetWeight: weight.valueAsNumber,
+				};
+
+				exerciseSetsDropdown.classList.toggle("hidden");
+
+				const exerciseSetItem = exerciseSets.querySelector(
+					`.exercise-set[data-set-number="${index + 1}"]`
+				);
+
+				exerciseSetItem.querySelector(".exercise-set-reps").textContent = reps.valueAsNumber;
+				exerciseSetItem.querySelector(
+					".exercise-set-weight"
+				).textContent = `${weight.valueAsNumber} kg`;
+			}
+		});
+
+	exerciseSets.querySelector(".exercise-sets-dropdown-btn").addEventListener("click", (e) => {
 		e.preventDefault();
-		editExercise(exercise, exerciseElement);
+		exerciseSetsDropdown.classList.toggle("hidden");
 	});
 
-	return exerciseElement;
+	return exerciseSetsDropdown;
 }
 
 addExerciseModal.querySelector("#close-exercise-modal").addEventListener("click", (e) => {
 	e.preventDefault();
 	addExerciseModal.classList.add("hidden");
 });
+
+async function editRestTime(exercise, exerciseElement) {
+	const element = exerciseElement.querySelector(".exercise-rest-time-value");
+	const button = exerciseElement.querySelector(".exercise-rest-time-edit");
+
+	const oldElement = exerciseElement.querySelector(".exercise-rest-time-value").cloneNode(true);
+	const oldButton = exerciseElement.querySelector(".exercise-rest-time-edit").cloneNode(true);
+	const oldValue = exercise.restTime;
+
+	const newElement = document.createElement("input");
+	newElement.type = "number";
+	newElement.value = exercise.restTime;
+	newElement.classList.add("input", "exercise-rest-time-value");
+
+	const newButton = document.createElement("button");
+	newButton.classList.add("exercise-rest-time-edit", "confirm");
+	newButton.insertAdjacentHTML(
+		"afterbegin",
+		`<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check-icon lucide-check"><path d="M20 6 9 17l-5-5"/></svg>`
+	);
+
+	element.replaceWith(newElement);
+	button.replaceWith(newButton);
+
+	const revert = (restTime) => {
+		newElement.replaceWith(oldElement);
+		newButton.replaceWith(oldButton);
+
+		oldElement.textContent = secondsToMinutesAndSeconds(restTime);
+
+		oldButton.addEventListener("click", () => {
+			editRestTime(exercise, exerciseElement);
+		});
+	};
+
+	newButton.addEventListener("click", async () => {
+		const restTime = newElement.valueAsNumber;
+
+		if (isNaN(restTime)) {
+			alert("Fyll i vilotid");
+			return;
+		}
+
+		if (restTime < 0) {
+			alert("Vilotid kan inte vara negativ");
+			return;
+		}
+
+		if (restTime == oldValue) {
+			revert(oldValue);
+			return;
+		}
+
+		exercise.restTime = restTime;
+
+		revert(restTime);
+	});
+}
 
 async function deleteExercise(exercise, exerciseElement) {
 	const confirmation = confirm(
@@ -113,106 +287,6 @@ async function deleteExercise(exercise, exerciseElement) {
 	exerciseElement.remove();
 
 	refreshExercisesIndex();
-}
-
-async function editExercise(exercise, exerciseElement) {
-	if (currentlyEditingExercise) return;
-	currentlyEditingExercise = true;
-
-	const setsValue = exerciseElement.querySelector(".exercise-sets");
-	const repsValue = exerciseElement.querySelector(".exercise-reps");
-	const oldSetsValue = setsValue.cloneNode(true);
-	const oldRepsValue = repsValue.cloneNode(true);
-
-	const editBtn = exerciseElement.querySelector(".edit-exercise");
-	const deleteBtn = exerciseElement.querySelector(".delete-exercise");
-	const oldEditBtn = editBtn.cloneNode(true);
-	const oldDeleteBtn = deleteBtn.cloneNode(true);
-
-	const newEditBtn = document.createElement("button");
-	newEditBtn.classList.add("btn", "small", "cancel-edit");
-	newEditBtn.insertAdjacentHTML(
-		"afterbegin",
-		`<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="trash"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>`
-	);
-
-	const newDeleteBtn = document.createElement("button");
-	newDeleteBtn.classList.add("btn", "small", "confirm-edit");
-	newDeleteBtn.insertAdjacentHTML(
-		"afterbegin",
-		`<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="confirm"><path d="M20 6 9 17l-5-5"/></svg>`
-	);
-
-	editBtn.replaceWith(newEditBtn);
-	deleteBtn.replaceWith(newDeleteBtn);
-
-	const newSetsValue = document.createElement("input");
-	newSetsValue.type = "number";
-	newSetsValue.value = setsValue.textContent;
-	newSetsValue.classList.add("input");
-
-	const newRepsValue = document.createElement("input");
-	newRepsValue.type = "number";
-	newRepsValue.value = repsValue.textContent;
-	newRepsValue.classList.add("input");
-
-	setsValue.replaceWith(newSetsValue);
-	repsValue.replaceWith(newRepsValue);
-
-	const revertButtons = () => {
-		newEditBtn.replaceWith(oldEditBtn);
-		newDeleteBtn.replaceWith(oldDeleteBtn);
-
-		// Reattach event listeners
-		oldEditBtn.addEventListener("click", () => {
-			editExercise(exercise, exerciseElement);
-		});
-
-		oldDeleteBtn.addEventListener("click", () => {
-			deleteExercise(exercise, exerciseElement);
-		});
-	};
-
-	// Cancel
-	newEditBtn.addEventListener("click", () => {
-		newSetsValue.replaceWith(oldSetsValue);
-		newRepsValue.replaceWith(oldRepsValue);
-
-		revertButtons();
-
-		currentlyEditingExercise = false;
-	});
-
-	// Confirm
-	newDeleteBtn.addEventListener("click", async () => {
-		const sets = newSetsValue.valueAsNumber;
-		const reps = newRepsValue.valueAsNumber;
-
-		if (!sets || !reps) {
-			alert("Fyll i alla fält");
-			return;
-		}
-
-		if (sets < 1 || reps < 1) {
-			alert("Sätt minst 1 set och 1 rep");
-			return;
-		}
-
-		const exerciseItem = exercises.find(
-			(exerciseItem) => exerciseItem.exerciseId == exercise.exerciseId
-		);
-		exerciseItem.sets = sets;
-		exerciseItem.reps = reps;
-
-		newSetsValue.replaceWith(oldSetsValue);
-		newRepsValue.replaceWith(oldRepsValue);
-
-		oldSetsValue.textContent = sets;
-		oldRepsValue.textContent = reps;
-
-		revertButtons();
-		currentlyEditingExercise = false;
-	});
 }
 
 document.querySelector("#submit-workout-form").addEventListener("click", async (e) => {
@@ -237,7 +311,7 @@ document.querySelector("#submit-workout-form").addEventListener("click", async (
 		.map((exercise) => ({
 			exerciseId: exercise.exerciseId,
 			sets: exercise.sets,
-			reps: exercise.reps,
+			restTime: exercise.restTime,
 		}));
 
 	for (const exercise of exercisesToAdd) {
