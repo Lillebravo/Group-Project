@@ -1,3 +1,5 @@
+import { getRequest, postRequest } from "../api.js";
+
 document.addEventListener("DOMContentLoaded", async () => {
   const listContainer = document.getElementById("exerciseList");
   const searchInput = document.getElementById("searchInput");
@@ -13,12 +15,29 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   let allExercises = [];
 
+  //Hjälpfunktion för token
+  function getJwtToken() {
+    const stored = localStorage.getItem("token");
+    if (!stored) return null;
+
+    try {
+      const { type, token } = JSON.parse(stored);
+      return `${type} ${token}`;
+    } catch (err) {
+      console.error("Kunde inte läsa token:", err);
+      return null;
+    }
+  }
+
   //Hämta övningar från API
   async function fetchExercises() {
     try {
-      const res = await fetch("/api/exercises"); //ändra till http://localhost:8080/api/exercises för test
-      if (!res.ok) throw new Error("Fel vid hämtning av övningar");
-      const data = await res.json();
+      const data = await getRequest("/exercises"); // använder api.js med token
+
+      if (!data || data.error) {
+        throw new Error(data?.error || "Fel vid hämtning av övningar");
+      }
+
       allExercises = data;
       renderExercises(data);
     } catch (err) {
@@ -32,7 +51,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const grouped = {};
 
     exercises.forEach((ex) => {
-      const group = ex.category || ex.muscleGroup || ex.muscle_group ||"Övrigt";
+      const group = ex.isCustomExercise ? "Egna Övningar" : (ex.category || ex.muscleGroup || ex.muscle_group || "Övrigt");
       if (!grouped[group]) grouped[group] = [];
       grouped[group].push(ex);
     });
@@ -40,7 +59,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     listContainer.innerHTML = "";
 
     Object.entries(grouped)
-      .sort(([a], [b]) => a.localeCompare(b))
+      .sort(([a], [b]) => {
+        if (a === "Egna Övningar") return -1;
+        if (b === "Egna Övningar") return 1;
+        return a.localeCompare(b);
+      })
       .forEach(([groupName, groupExercises]) => {
         const groupEl = document.createElement("div");
         groupEl.className = "exercise-group";
@@ -108,6 +131,59 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   //Stäng modal
   closeModal.addEventListener("click", () => modal.classList.add("hidden"));
+
+  //Modalhantering för egna övningar
+  const createBtn = document.getElementById("createExerciseBtn");
+  const createModal = document.getElementById("createExerciseModal");
+  const closeCreateModal = document.getElementById("closeCreateModal");
+  const saveCustomBtn = document.getElementById("saveCustomExercise");
+
+  createBtn.addEventListener("click", () => {
+    createModal.classList.remove("hidden");
+  });
+
+  closeCreateModal.addEventListener("click", () => {
+    createModal.classList.add("hidden");
+  });
+
+  //Spara egen övning
+  saveCustomBtn.addEventListener("click", async () => {
+    const name = document.getElementById("customName").value.trim();
+    const category = document.getElementById("customCategory").value.trim();
+    const description = document.getElementById("customDescription").value.trim();
+
+    if (!name || !category) {
+      alert("Namn och muskelgrupp krävs.");
+      return;
+    }
+
+    const token = getJwtToken();
+    if (!token) {
+      alert("Du måste vara inloggad för att skapa egna övningar.");
+      return;
+    }
+
+    try {
+      const data = await postRequest("/exercises/custom", { name, category, description });
+
+      if (!data || data.error) {
+        throw new Error(data?.error || "Kunde inte spara övning");
+      }
+
+      alert("Övning skapad!");
+      createModal.classList.add("hidden");
+
+      document.getElementById("customName").value = "";
+      document.getElementById("customCategory").value = "";
+      document.getElementById("customDescription").value = "";
+
+      fetchExercises();
+    } catch (err) {
+      console.error("Fel vid sparande:", err);
+      alert("Något gick fel vid sparande av övning.");
+    }
+
+  });
 
   //Initiera sidan
   fetchExercises();
