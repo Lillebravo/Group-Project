@@ -68,3 +68,41 @@
   margin-top: 40px;
 }
 
+#createExerciseBtn {
+  margin-bottom: 24px;
+}
+
+#createExerciseModal .modal-content {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 24px;
+  max-width: 420px;
+  margin: 0 auto;
+}
+
+#createExerciseModal label {
+  font-weight: 600;
+  margin-bottom: 4px;
+  text-align: left;
+}
+
+#createExerciseModal input,
+#createExerciseModal textarea {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+#createExerciseModal textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+#saveCustomExercise {
+  margin-top: 10px;
+  align-self: flex-end;
+}
