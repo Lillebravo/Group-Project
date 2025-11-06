@@ -52,6 +52,24 @@
       </div>
     </div>
 
+    <!-- Redigera egen övning -->
+    <div id="editExerciseModal" class="modal hidden">
+      <div class="modal-content">
+        <span id="closeEditModal" class="close">&times;</span>
+        <h2>Redigera övning</h2>
+
+        <label for="editName">Namn</label>
+        <input type="text" id="editName" placeholder="Övningsnamn" />
+
+        <label for="editCategory">Muskelgrupp</label>
+        <input type="text" id="editCategory" placeholder="Ex: Ben, Bröst" />
+
+        <label for="editDescription">Beskrivning</label>
+        <textarea id="editDescription" placeholder="Kort beskrivning..."></textarea>
+
+        <button id="saveEditedExercise" class="btn success">Spara ändringar</button>
+      </div>
+    </div>
 
     <!-- Lista över muskelgrupper -->
     <section id="exerciseList" class="exercise-list">

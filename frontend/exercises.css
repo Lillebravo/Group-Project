@@ -106,3 +106,58 @@
   margin-top: 10px;
   align-self: flex-end;
 }
+
+#editExerciseModal .modal-content {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 24px;
+  max-width: 420px;
+  margin: 0 auto;
+}
+
+#editExerciseModal label {
+  font-weight: 600;
+  margin-bottom: 4px;
+  text-align: left;
+}
+
+#editExerciseModal input,
+#editExerciseModal textarea {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+#editExerciseModal textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+#saveEditedExercise {
+  margin-top: 10px;
+  align-self: flex-end;
+}
+
+.edit-btn,
+.delete-btn {
+  margin-left: 8px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  transition: transform 0.15s ease, color 0.2s ease;
+}
+
+.edit-btn:hover {
+  color: var(--accent);
+  transform: scale(1.15);
+}
+
+.delete-btn:hover {
+  color: #e74c3c; 
+  transform: scale(1.15);
+}
