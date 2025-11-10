@@ -29,19 +29,17 @@ public class Routine {
     @OneToMany(mappedBy = "routine", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<RoutineWorkout> routineWorkouts = new ArrayList<>();
 
-    public Routine() {
-        this.createdAt = LocalDateTime.now();
-    }
 
-    public Routine(String name, String description) {
-        this.name = name;
-        this.description = description;
-    }
 
-    public Routine(User user, String name, String description) {
+    public Routine(User user, String name, String description, LocalDateTime createdAt) {
         this.user = user;
         this.name = name;
         this.description = description;
+        this.createdAt = createdAt;
+  }
+
+    public Routine() {
+
     }
 
     // Getters and Setters
