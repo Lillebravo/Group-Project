@@ -30,17 +30,17 @@ private final RoutineWorkoutRepository routineWorkoutRepository;
 
     @Transactional
     public void addWorkoutToRoutine(Long routineId, Long workoutId, String weekDay, Integer dayOrder) {
-        // 1️⃣ Hämta inloggad användare
+
         User user = workoutService.getAuthenticatedUser();
 
-        // 2️⃣ Hämta rutinen och säkerställ att den tillhör användaren
+
         Routine routine = routineRepository.findById(routineId)
                 .orElseThrow(() -> new RuntimeException("Routine not found"));
         if (routine.getUser().getUserId() != user.getUserId()) {
             throw new RuntimeException("You don't have permission to modify this routine.");
         }
 
-        // 3️⃣ Hämta workout och säkerställ att den tillhör användaren
+
         Workout workout = workoutRepository.findById(workoutId)
                 .orElseThrow(() -> new RuntimeException("Workout not found"));
         if (workout.getUser().getUserId() != user.getUserId()) {
@@ -48,7 +48,7 @@ private final RoutineWorkoutRepository routineWorkoutRepository;
         }
 
 
-        // 4️⃣ Skapa kopplingen i routine_workouts
+
         RoutineWorkout rw = new RoutineWorkout();
         rw.setRoutine(routine);
         rw.setWorkout(workout);

@@ -5,6 +5,7 @@ public class RoutineWorkoutRequest {
     private String weekDay;
     private Integer dayOrder;
 
+    // --- Getters och Setters ---
     public Long getWorkoutId() {
         return workoutId;
     }
